@@ -12,6 +12,7 @@ use App\Domain\Wallet\Events\WalletCreated;
 use App\Domain\Wallet\Exceptions\DailyLimitExceededException;
 use App\Domain\Wallet\Exceptions\InsufficientBalanceException;
 use App\Domain\Wallet\Exceptions\InvalidAmountException;
+use App\Domain\Wallet\Exceptions\InvalidIdempotencyKeyException;
 use App\Domain\Wallet\Exceptions\WalletNotCreatedException;
 use Carbon\Carbon;
 use Spatie\EventSourcing\AggregateRoots\AggregateRoot;
@@ -49,7 +50,7 @@ final class WalletAggregate extends AggregateRoot
     {
         $this->recordThat(new WalletCreated(
             walletId: $this->uuid(),
-            userId: $userId,  // string UUID
+            userId: $userId,
             currency: $currency
         ));
 
@@ -66,7 +67,7 @@ final class WalletAggregate extends AggregateRoot
 
         $newBalance = $this->balanceCents + $amountCents;
 
-        $idempotencyKey = $metadata['idempotency_key'] ?? '';
+        $idempotencyKey = $metadata['idempotency_key'] ?? throw new InvalidIdempotencyKeyException();
         unset($metadata['idempotency_key']);
 
         $this->recordThat(new MoneyDeposited(
@@ -261,7 +262,8 @@ final class WalletAggregate extends AggregateRoot
 
     private function ensureDailyWithdrawalLimitNotExceeded(int $amountCents): void
     {
-        $currentUsage = $this->lastTransactionDate?->isToday() ? $this->dailyWithdrawalAmount : 0;
+        $todayUTC = Carbon::now('UTC')->startOfDay();
+        $currentUsage = $this->isTransactionToday($todayUTC) ? $this->dailyWithdrawalAmount : 0;
         $limit = config('wallet.daily_limits.withdrawal');
 
         if (($currentUsage + $amountCents) > $limit) {
@@ -271,7 +273,8 @@ final class WalletAggregate extends AggregateRoot
 
     private function ensureDailyTransferLimitNotExceeded(int $amountCents): void
     {
-        $currentUsage = $this->lastTransactionDate?->isToday() ? $this->dailyTransferOutAmount : 0;
+        $todayUTC = Carbon::now('UTC')->startOfDay();
+        $currentUsage = $this->isTransactionToday($todayUTC) ? $this->dailyTransferOutAmount : 0;
         $limit = config('wallet.daily_limits.transfer');
 
         if (($currentUsage + $amountCents) > $limit) {
@@ -279,29 +282,35 @@ final class WalletAggregate extends AggregateRoot
         }
     }
 
-    private function updateDailyWithdrawalAmount(int $amountCents): void
+    private function isTransactionToday(Carbon $todayUTC): bool
     {
-        $today = Carbon::today();
-
-        if (null === $this->lastTransactionDate || ! $this->lastTransactionDate->isSameDay($today)) {
-            $this->dailyWithdrawalAmount = $amountCents;
-        } else {
-            $this->dailyWithdrawalAmount += $amountCents;
+        if (null === $this->lastTransactionDate) {
+            return false;
         }
 
-        $this->lastTransactionDate = $today;
+        return $this->lastTransactionDate->isSameDay($todayUTC);
+    }
+
+    private function updateDailyUsage(string $propertyName, int $amountCents): void
+    {
+        $todayUTC = Carbon::now('UTC')->startOfDay();
+
+        if (! $this->isTransactionToday($todayUTC)) {
+            $this->{$propertyName} = $amountCents;
+        } else {
+            $this->{$propertyName} += $amountCents;
+        }
+
+        $this->lastTransactionDate = $todayUTC;
+    }
+
+    private function updateDailyWithdrawalAmount(int $amountCents): void
+    {
+        $this->updateDailyUsage('dailyWithdrawalAmount', $amountCents);
     }
 
     private function updateDailyTransferOutAmount(int $amountCents): void
     {
-        $today = Carbon::today();
-
-        if (null === $this->lastTransactionDate || ! $this->lastTransactionDate->isSameDay($today)) {
-            $this->dailyTransferOutAmount = $amountCents;
-        } else {
-            $this->dailyTransferOutAmount += $amountCents;
-        }
-
-        $this->lastTransactionDate = $today;
+        $this->updateDailyUsage('dailyTransferOutAmount', $amountCents);
     }
 }

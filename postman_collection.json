@@ -269,7 +269,7 @@
             "name": "User",
             "item": [
                 {
-                    "name": "Get Wallet by User ID",
+                    "name": "Get Current User Wallet",
                     "event": [
                         {
                             "listen": "test",
@@ -308,14 +308,13 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/users/{{user_id}}/wallet",
+                            "raw": "{{base_url}}/api/user/wallet",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
-                                "users",
-                                "{{user_id}}",
+                                "user",
                                 "wallet"
                             ]
                         }

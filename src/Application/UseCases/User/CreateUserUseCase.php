@@ -10,6 +10,7 @@ use App\Application\DTOs\User\CreateUserDTO;
 use App\Application\DTOs\Wallet\CreateWalletDTO;
 use App\Application\UseCases\Wallet\CreateWalletUseCase;
 use App\Domain\User\Aggregates\UserAggregate;
+use App\Domain\User\Exceptions\UserAlreadyExistsException;
 use App\Domain\User\Exceptions\UserNotExistsException;
 use App\Domain\User\Repositories\UserRepositoryInterface;
 use App\Domain\User\Services\AuthenticationServiceInterface;
@@ -30,9 +31,6 @@ final readonly class CreateUserUseCase implements CreateUserUseCaseInterface
         private AuthenticationServiceInterface $authService
     ) {}
 
-    /**
-     * @throws Throwable
-     */
     public function execute(CreateUserDTO $dto): AuthResultDTO
     {
         $email = Email::from($dto->email);
@@ -40,7 +38,7 @@ final readonly class CreateUserUseCase implements CreateUserUseCaseInterface
         $password = Password::from($dto->password);
 
         if ($this->userRepository->emailExists($email)) {
-            throw UserNotExistsException::withEmail($dto->email);
+            throw UserAlreadyExistsException::withEmail($dto->email);
         }
 
         $userId = new UserId(Str::orderedUuid()->toString());

@@ -1,10 +1,3 @@
-# Wallet API - Docker Compose Stack
-# Services:
-#   - Laravel API:    http://localhost:8080
-#   - Mailpit:        http://localhost:8025
-#   - Redis:          localhost:6379
-#   - Wirehook:       http://localhost:9000
-#   - DBGate:         http://localhost:8090
 
 services:
     laravel:

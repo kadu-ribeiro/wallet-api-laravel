@@ -8,12 +8,7 @@ use App\Domain\User\Events\UserCreated;
 use App\Domain\User\Exceptions\UserNotExistsException;
 use Spatie\EventSourcing\AggregateRoots\AggregateRoot;
 
-/**
- * User Aggregate Root.
- *
- * Manages user lifecycle using Event Sourcing.
- * Business rules: unique email, valid data.
- */
+
 final class UserAggregate extends AggregateRoot
 {
     private ?string $email = null;
@@ -38,10 +33,6 @@ final class UserAggregate extends AggregateRoot
 
         return $this;
     }
-
-    // ========================================================================
-    // Event Appliers (rebuild state from events)
-    // ========================================================================
 
     protected function applyUserCreated(UserCreated $event): void
     {

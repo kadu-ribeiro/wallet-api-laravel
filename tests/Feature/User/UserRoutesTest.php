@@ -35,7 +35,7 @@ test('unauthenticated user cannot get user data', function (): void {
     $response->assertUnauthorized();
 });
 
-test('can get wallet by user id', function (): void {
+test('can get current user wallet', function (): void {
     $registerResponse = $this->postJson('/api/auth/register', [
         'name' => 'Test User',
         'email' => 'test@example.com',
@@ -44,10 +44,9 @@ test('can get wallet by user id', function (): void {
     ]);
 
     $token = $registerResponse->json('token');
-    $userId = $registerResponse->json('user.id');
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
-        ->getJson("/api/users/{$userId}/wallet")
+        ->getJson('/api/user/wallet')
     ;
 
     $response->assertOk()
@@ -62,29 +61,8 @@ test('can get wallet by user id', function (): void {
     ;
 });
 
-test('returns 404 when wallet not found for user', function (): void {
-    $registerResponse = $this->postJson('/api/auth/register', [
-        'name' => 'Test User',
-        'email' => 'test@example.com',
-        'password' => 'password123',
-        'password_confirmation' => 'password123',
-    ]);
-
-    $token = $registerResponse->json('token');
-
-    $userWithoutWallet = User::factory()->create();
-
-    $response = $this->withHeader('Authorization', "Bearer {$token}")
-        ->getJson("/api/users/{$userWithoutWallet->id}/wallet")
-    ;
-
-    $response->assertNotFound()
-        ->assertJsonPath('error', fn ($value) => str_contains($value, 'not found'))
-    ;
-});
-
-test('unauthenticated user cannot get wallet by user id', function (): void {
-    $response = $this->getJson('/api/users/some-uuid/wallet');
+test('unauthenticated user cannot get current user wallet', function (): void {
+    $response = $this->getJson('/api/user/wallet');
 
     $response->assertUnauthorized();
 });
@@ -106,7 +84,7 @@ test('authenticated user can get their own data via usecase', function (): void 
     ;
 });
 
-test('can retrieve wallet by user id', function (): void {
+test('can retrieve current user wallet via actingAs', function (): void {
     $user = User::factory()->create();
     $walletId = Str::uuid()->toString();
 
@@ -116,7 +94,7 @@ test('can retrieve wallet by user id', function (): void {
     ;
 
     $this->actingAs($user)
-        ->getJson("/api/users/{$user->id}/wallet")
+        ->getJson('/api/user/wallet')
         ->assertStatus(200)
         ->assertJsonPath('data.user_id', $user->id)
     ;

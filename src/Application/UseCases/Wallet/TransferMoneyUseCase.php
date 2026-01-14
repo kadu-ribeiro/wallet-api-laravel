@@ -20,7 +20,6 @@ use App\Domain\Wallet\ValueObjects\Money;
 use App\Domain\Wallet\ValueObjects\WalletId;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use Throwable;
 
 final readonly class TransferMoneyUseCase implements TransferMoneyUseCaseInterface
 {
@@ -29,9 +28,6 @@ final readonly class TransferMoneyUseCase implements TransferMoneyUseCaseInterfa
         private WalletRepositoryInterface $walletRepository
     ) {}
 
-    /**
-     * @throws Throwable
-     */
     public function execute(TransferMoneyDTO $dto): TransferResultDTO
     {
         $this->walletRepository->findById(new WalletId($dto->walletId))

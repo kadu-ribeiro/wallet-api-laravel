@@ -534,7 +534,7 @@ The idempotency key is stored in the transactions table. The database enforces u
 | POST | `/auth/login` | Login user | No | No |
 | POST | `/auth/logout` | Logout user | Yes | No |
 | GET | `/user` | Get authenticated user info | Yes | No |
-| GET | `/users/{userId}/wallet` | Get wallet by user ID | Yes | No |
+| GET | `/user/wallet` | Get current user's wallet | Yes | No |
 | GET | `/wallets/{walletId}` | Get wallet details | Yes | No |
 | GET | `/wallets/{walletId}/balance` | Get wallet balance | Yes | No |
 | GET | `/wallets/{walletId}/transactions` | Get transaction history | Yes | No |

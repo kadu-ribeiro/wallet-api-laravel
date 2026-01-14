@@ -119,15 +119,15 @@ assert_http_code "200" "$HTTP_CODE" "Get user info"
 assert_json_contains "$BODY" "data"
 echo "$BODY" | jq -c '.data | {id, name, email, wallet_id}'
 
-# --- TEST 4.2: Get Wallet by User ID (New Route) ---
+# --- TEST 4.2: Get Current User Wallet ---
 echo "\n==================================================================="
-echo ">>> TEST 4.2: GET /api/users/{userId}/wallet"
+echo ">>> TEST 4.2: GET /api/user/wallet"
 echo "==================================================================="
-RESPONSE=$(run_curl -w "\n%{http_code}" -X GET "$API_URL/users/$USER_ID/wallet" \
+RESPONSE=$(run_curl -w "\n%{http_code}" -X GET "$API_URL/user/wallet" \
   -H "Authorization: Bearer $TOKEN")
 HTTP_CODE=$(echo "$RESPONSE" | tail -1)
 BODY=$(echo "$RESPONSE" | sed '$d')
-assert_http_code "200" "$HTTP_CODE" "Get wallet by user ID"
+assert_http_code "200" "$HTTP_CODE" "Get current user wallet"
 echo "$BODY" | jq -c '.data | {id, user_id, balance, currency}'
 
 # --- TEST 5: Invalid Login ---
