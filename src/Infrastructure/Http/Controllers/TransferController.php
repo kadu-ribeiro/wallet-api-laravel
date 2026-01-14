@@ -17,7 +17,16 @@ class TransferController extends Controller
 
     public function store(TransferRequest $request): JsonResponse
     {
-        $result = $this->transferMoneyUseCase->execute(TransferMoneyDTO::fromRequest($request));
+        $result = $this->transferMoneyUseCase->execute(
+            TransferMoneyDTO::fromPrimitives(
+                walletId: $request->senderWalletId(),
+                recipientEmail: $request->recipientEmail(),
+                amount: $request->amount(),
+                idempotencyKey: $request->idempotencyKey(),
+                userEmail: $request->senderEmail(),
+                metadata: $request->metadata()
+            )
+        );
 
         return response()->json($result->toArray());
     }

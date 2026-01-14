@@ -8,7 +8,6 @@ use App\Application\Contracts\Wallet\DepositMoneyUseCaseInterface;
 use App\Application\DTOs\Wallet\DepositMoneyDTO;
 use App\Application\DTOs\Wallet\DepositResultDTO;
 use App\Domain\Wallet\Aggregates\WalletAggregate;
-use App\Domain\Wallet\Exceptions\InvalidAmountException;
 use App\Domain\Wallet\Exceptions\TransferAlreadyProcessedException;
 use App\Domain\Wallet\ValueObjects\Money;
 use Illuminate\Database\QueryException;
@@ -36,8 +35,6 @@ final readonly class DepositMoneyUseCase implements DepositMoneyUseCaseInterface
                 balance: $balance->toDecimal(),
                 currency: $aggregate->getCurrency()
             );
-        } catch (InvalidAmountException $e) {
-            throw InvalidAmountException::mustBePositive();
         } catch (UniqueConstraintViolationException $e) {
             throw TransferAlreadyProcessedException::withIdempotencyKey($dto->idempotencyKey);
         } catch (QueryException $e) {

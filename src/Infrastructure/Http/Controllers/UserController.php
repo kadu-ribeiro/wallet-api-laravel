@@ -25,7 +25,13 @@ class UserController extends Controller
 
     public function register(RegisterUserRequest $request): JsonResponse
     {
-        $result = $this->createUserUseCase->execute(CreateUserDTO::fromRequest($request));
+        $result = $this->createUserUseCase->execute(
+            CreateUserDTO::fromPrimitives(
+                name: $request->userName(),
+                email: $request->userEmail(),
+                password: $request->userPassword()
+            )
+        );
 
         return response()->json($result->toArray(), 201);
     }

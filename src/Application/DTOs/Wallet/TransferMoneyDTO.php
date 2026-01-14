@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Application\DTOs\Wallet;
 
-use App\Infrastructure\Http\Requests\TransferRequest;
-
 final readonly class TransferMoneyDTO
 {
     public function __construct(
@@ -17,15 +15,21 @@ final readonly class TransferMoneyDTO
         public array $metadata = []
     ) {}
 
-    public static function fromRequest(TransferRequest $request): self
-    {
+    public static function fromPrimitives(
+        string $walletId,
+        string $recipientEmail,
+        string $amount,
+        string $idempotencyKey,
+        ?string $userEmail = null,
+        array $metadata = []
+    ): self {
         return new self(
-            walletId: $request->senderWalletId() ?? '',
-            recipientEmail: $request->recipientEmail(),
-            amount: $request->amount(),
-            idempotencyKey: $request->idempotencyKey(),
-            userEmail: $request->senderEmail(),
-            metadata: $request->metadata()
+            walletId: $walletId,
+            recipientEmail: $recipientEmail,
+            amount: $amount,
+            idempotencyKey: $idempotencyKey,
+            userEmail: $userEmail,
+            metadata: $metadata
         );
     }
 }

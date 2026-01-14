@@ -11,6 +11,7 @@ use App\Domain\User\Exceptions\InvalidPasswordException;
 use App\Domain\User\Exceptions\InvalidUserNameException;
 use App\Domain\User\Exceptions\UserAlreadyExistsException;
 use App\Domain\User\Exceptions\UserNotExistsException;
+use App\Domain\Wallet\Exceptions\DailyLimitExceededException;
 use App\Domain\Wallet\Exceptions\InsufficientBalanceException;
 use App\Domain\Wallet\Exceptions\InvalidAmountException;
 use App\Domain\Wallet\Exceptions\RecipientNotFoundException;
@@ -51,6 +52,11 @@ final class ExceptionHandler
         ));
 
         $handler->renderable(fn (InsufficientBalanceException $e, Request $r): JsonResponse => response()->json(
+            ['error' => $e->getMessage()],
+            Response::HTTP_UNPROCESSABLE_ENTITY
+        ));
+
+        $handler->renderable(fn (DailyLimitExceededException $e, Request $r): JsonResponse => response()->json(
             ['error' => $e->getMessage()],
             Response::HTTP_UNPROCESSABLE_ENTITY
         ));

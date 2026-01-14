@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domain\User\Aggregates;
 
 use App\Domain\User\Events\UserCreated;
+use App\Domain\User\Exceptions\UserAlreadyExistsException;
 use App\Domain\User\Exceptions\UserNotExistsException;
 use Spatie\EventSourcing\AggregateRoots\AggregateRoot;
 
@@ -20,7 +21,7 @@ final class UserAggregate extends AggregateRoot
         string $passwordHash
     ): self {
         if ($this->isCreated) {
-            throw new UserNotExistsException();
+            throw new UserAlreadyExistsException();
         }
 
         $this->recordThat(new UserCreated(

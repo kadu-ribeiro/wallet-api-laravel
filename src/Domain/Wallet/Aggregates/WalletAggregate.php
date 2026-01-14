@@ -94,7 +94,7 @@ final class WalletAggregate extends AggregateRoot
 
         $newBalance = $this->balanceCents - $amountCents;
 
-        $idempotencyKey = $metadata['idempotency_key'] ?? '';
+        $idempotencyKey = $metadata['idempotency_key'] ?? throw new InvalidIdempotencyKeyException();
         unset($metadata['idempotency_key']);
 
         $this->recordThat(new MoneyWithdrawn(

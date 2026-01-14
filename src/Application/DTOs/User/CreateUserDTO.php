@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Application\DTOs\User;
 
-use App\Infrastructure\Http\Requests\RegisterUserRequest;
-
 final readonly class CreateUserDTO
 {
     public function __construct(
@@ -14,12 +12,15 @@ final readonly class CreateUserDTO
         public string $password
     ) {}
 
-    public static function fromRequest(RegisterUserRequest $request): self
-    {
+    public static function fromPrimitives(
+        string $name,
+        string $email,
+        string $password
+    ): self {
         return new self(
-            name: $request->userName(),
-            email: $request->userEmail(),
-            password: $request->userPassword()
+            name: $name,
+            email: $email,
+            password: $password
         );
     }
 }
