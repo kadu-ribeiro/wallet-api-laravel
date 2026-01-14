@@ -1,0 +1,77 @@
+{
+    "preset": "laravel",
+    "exclude": [
+        "vendor",
+        "storage",
+        "node_modules",
+        "tests",
+        "resources",
+        "bootstrap/cache",
+        "public",
+        "config",
+        "database/migrations"
+    ],
+    "notName": [
+        "*.blade.php",
+        "README.md",
+        "*.xml",
+        "*.yml",
+        "_ide_helper_models.php",
+        "_ide_helper.php",
+        ".phpstorm.meta.php"
+    ],
+    "rules": {
+        "@Symfony": true,
+        "@PSR12": true,
+        "@PhpCsFixer": true,
+        "@PHP84Migration": true,
+        "declare_strict_types": true,
+        "method_argument_space": true,
+        "no_unused_imports": false,
+        "binary_operator_spaces": {
+            "operators": {
+                "=": "align_single_space_minimal",
+                "xor": null,
+                "+=": "align_single_space_minimal",
+                "=>": "align_single_space_minimal",
+                "|": "align_single_space_minimal"
+            }
+        },
+        "concat_space": {
+            "spacing": "one"
+        },
+        "multiline_whitespace_before_semicolons": {
+            "strategy": "no_multi_line"
+        },
+        "no_empty_phpdoc": false,
+        "php_unit_method_casing": {
+            "case": "camel_case"
+        },
+        "single_blank_line_at_eof": true,
+        "phpdoc_align": false,
+        "phpdoc_single_line_var_spacing": false,
+        "phpdoc_to_return_type": true,
+        "fully_qualified_strict_types": true,
+        "void_return": true,
+        "global_namespace_import": {
+            "import_classes": true,
+            "import_constants": true,
+            "import_functions": true
+        },
+        "ordered_imports": {
+            "sort_algorithm": "alpha"
+        },
+        "phpdoc_to_param_type": true,
+        "phpdoc_to_property_type": true,
+        "no_empty_comment": true,
+        "no_trailing_whitespace_in_comment": true,
+        "single_line_comment_style": {
+            "comment_types": ["hash"]
+        },
+        "no_superfluous_phpdoc_tags": true,
+        "phpdoc_no_useless_inheritdoc": true,
+        "no_useless_else": true,
+        "no_useless_return": true
+
+    }
+}
