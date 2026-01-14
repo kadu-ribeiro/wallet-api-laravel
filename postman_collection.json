@@ -266,63 +266,6 @@
             ]
         },
         {
-            "name": "User",
-            "item": [
-                {
-                    "name": "Get Current User Wallet",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "pm.test('Status code is 200', function () {",
-                                    "    pm.response.to.have.status(200);",
-                                    "});",
-                                    "",
-                                    "pm.test('Response has wallet data', function () {",
-                                    "    var jsonData = pm.response.json();",
-                                    "    pm.expect(jsonData.data).to.have.property('id');",
-                                    "    pm.expect(jsonData.data).to.have.property('balance');",
-                                    "});"
-                                ],
-                                "type": "text/javascript"
-                            }
-                        }
-                    ],
-                    "request": {
-                        "auth": {
-                            "type": "bearer",
-                            "bearer": [
-                                {
-                                    "key": "token",
-                                    "value": "{{token}}",
-                                    "type": "string"
-                                }
-                            ]
-                        },
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Accept",
-                                "value": "application/json"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/user/wallet",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "user",
-                                "wallet"
-                            ]
-                        }
-                    }
-                }
-            ]
-        },
-        {
             "name": "Wallet",
             "item": [
                 {
@@ -364,14 +307,13 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/wallets/{{wallet_id}}",
+                            "raw": "{{base_url}}/api/wallet",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
-                                "wallets",
-                                "{{wallet_id}}"
+                                "wallet"
                             ]
                         }
                     }
@@ -416,14 +358,13 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/wallets/{{wallet_id}}/balance",
+                            "raw": "{{base_url}}/api/wallet/balance",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
-                                "wallets",
-                                "{{wallet_id}}",
+                                "wallet",
                                 "balance"
                             ]
                         }
@@ -472,14 +413,13 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/wallets/{{wallet_id}}/transactions",
+                            "raw": "{{base_url}}/api/wallet/transactions",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
-                                "wallets",
-                                "{{wallet_id}}",
+                                "wallet",
                                 "transactions"
                             ]
                         }
@@ -538,14 +478,13 @@
                             "raw": "{\n    \"amount\": \"100.00\"\n}"
                         },
                         "url": {
-                            "raw": "{{base_url}}/api/wallets/{{wallet_id}}/deposit",
+                            "raw": "{{base_url}}/api/wallet/deposit",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
-                                "wallets",
-                                "{{wallet_id}}",
+                                "wallet",
                                 "deposit"
                             ]
                         }
@@ -604,14 +543,13 @@
                             "raw": "{\n    \"amount\": \"25.00\"\n}"
                         },
                         "url": {
-                            "raw": "{{base_url}}/api/wallets/{{wallet_id}}/withdraw",
+                            "raw": "{{base_url}}/api/wallet/withdraw",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
-                                "wallets",
-                                "{{wallet_id}}",
+                                "wallet",
                                 "withdraw"
                             ]
                         }
@@ -857,14 +795,13 @@
                             "raw": "{\n    \"amount\": \"999999.00\"\n}"
                         },
                         "url": {
-                            "raw": "{{base_url}}/api/wallets/{{wallet_id}}/withdraw",
+                            "raw": "{{base_url}}/api/wallet/withdraw",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
-                                "wallets",
-                                "{{wallet_id}}",
+                                "wallet",
                                 "withdraw"
                             ]
                         }
@@ -894,14 +831,13 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/wallets/{{wallet_id}}/balance",
+                            "raw": "{{base_url}}/api/wallet/balance",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
-                                "wallets",
-                                "{{wallet_id}}",
+                                "wallet",
                                 "balance"
                             ]
                         }

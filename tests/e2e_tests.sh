@@ -119,15 +119,15 @@ assert_http_code "200" "$HTTP_CODE" "Get user info"
 assert_json_contains "$BODY" "data"
 echo "$BODY" | jq -c '.data | {id, name, email, wallet_id}'
 
-# --- TEST 4.2: Get Current User Wallet ---
+# --- TEST 4.2: Get Wallet ---
 echo "\n==================================================================="
-echo ">>> TEST 4.2: GET /api/user/wallet"
+echo ">>> TEST 4.2: GET /api/wallet"
 echo "==================================================================="
-RESPONSE=$(run_curl -w "\n%{http_code}" -X GET "$API_URL/user/wallet" \
+RESPONSE=$(run_curl -w "\n%{http_code}" -X GET "$API_URL/wallet" \
   -H "Authorization: Bearer $TOKEN")
 HTTP_CODE=$(echo "$RESPONSE" | tail -1)
 BODY=$(echo "$RESPONSE" | sed '$d')
-assert_http_code "200" "$HTTP_CODE" "Get current user wallet"
+assert_http_code "200" "$HTTP_CODE" "Get wallet"
 echo "$BODY" | jq -c '.data | {id, user_id, balance, currency}'
 
 # --- TEST 5: Invalid Login ---
@@ -144,7 +144,7 @@ echo "\n==================================================================="
 echo ">>> TEST 6: Deposit R\$1000"
 echo "==================================================================="
 UUID_DEP1=$(cat /proc/sys/kernel/random/uuid)
-RESPONSE=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/wallets/$WALLET_ID/deposit" \
+RESPONSE=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/wallet/deposit" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Idempotency-Key: $UUID_DEP1" \
   -d '{"amount":"1000.00"}')
@@ -158,7 +158,7 @@ echo "\n==================================================================="
 echo ">>> TEST 7: Negative Amount (Expect 422)"
 echo "==================================================================="
 UUID_NEG=$(cat /proc/sys/kernel/random/uuid)
-RESPONSE=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/wallets/$WALLET_ID/deposit" \
+RESPONSE=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/wallet/deposit" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Idempotency-Key: $UUID_NEG" \
   -d '{"amount":"-100.00"}')
@@ -170,7 +170,7 @@ echo "\n==================================================================="
 echo ">>> TEST 8: Withdraw R\$200"
 echo "==================================================================="
 UUID_WDW=$(cat /proc/sys/kernel/random/uuid)
-RESPONSE=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/wallets/$WALLET_ID/withdraw" \
+RESPONSE=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/wallet/withdraw" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Idempotency-Key: $UUID_WDW" \
   -d '{"amount":"200.00"}')
@@ -184,7 +184,7 @@ echo "\n==================================================================="
 echo ">>> TEST 9: Insufficient Balance (Expect 422)"
 echo "==================================================================="
 UUID_INS=$(cat /proc/sys/kernel/random/uuid)
-RESPONSE=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/wallets/$WALLET_ID/withdraw" \
+RESPONSE=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/wallet/withdraw" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Idempotency-Key: $UUID_INS" \
   -d '{"amount":"99999.00"}')
@@ -238,12 +238,12 @@ echo ">>> TEST 13: Idempotency - Duplicate Deposit (Expect 409)"
 echo "==================================================================="
 UUID_DUP=$(cat /proc/sys/kernel/random/uuid)
 # First request
-run_curl -X POST "$API_URL/wallets/$WALLET_ID/deposit" \
+run_curl -X POST "$API_URL/wallet/deposit" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Idempotency-Key: $UUID_DUP" \
   -d '{"amount":"50.00"}' > /dev/null
 # Duplicate request
-RESPONSE2=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/wallets/$WALLET_ID/deposit" \
+RESPONSE2=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/wallet/deposit" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Idempotency-Key: $UUID_DUP" \
   -d '{"amount":"50.00"}')
@@ -254,7 +254,7 @@ assert_http_code "409" "$HTTP2" "Duplicate idempotency key"
 echo "\n==================================================================="
 echo ">>> TEST 14: Missing Idempotency-Key (Expect 400)"
 echo "==================================================================="
-RESPONSE=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/wallets/$WALLET_ID/deposit" \
+RESPONSE=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/wallet/deposit" \
   -H "Authorization: Bearer $TOKEN" \
   -d '{"amount":"10.00"}')
 HTTP_CODE=$(echo "$RESPONSE" | tail -1)
@@ -264,7 +264,7 @@ assert_http_code "400" "$HTTP_CODE" "Missing idempotency key"
 echo "\n==================================================================="
 echo ">>> TEST 15: Invalid Idempotency-Key (Expect 422)"
 echo "==================================================================="
-RESPONSE=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/wallets/$WALLET_ID/deposit" \
+RESPONSE=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/wallet/deposit" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Idempotency-Key: invalid-key" \
   -d '{"amount":"10.00"}')
@@ -276,7 +276,7 @@ echo "\n==================================================================="
 echo ">>> TEST 16: Unauthorized Request (Expect 401)"
 echo "==================================================================="
 # No token, Expect 401
-RESPONSE=$(run_curl -w "\n%{http_code}" -X GET "$API_URL/wallets/$WALLET_ID/balance")
+RESPONSE=$(run_curl -w "\n%{http_code}" -X GET "$API_URL/wallet/balance")
 HTTP_CODE=$(echo "$RESPONSE" | tail -1)
 assert_http_code "401" "$HTTP_CODE" "Unauthorized"
 
@@ -284,7 +284,7 @@ assert_http_code "401" "$HTTP_CODE" "Unauthorized"
 echo "\n==================================================================="
 echo ">>> TEST 17: Transaction History"
 echo "==================================================================="
-RESPONSE=$(run_curl -w "\n%{http_code}" -X GET "$API_URL/wallets/$WALLET_ID/transactions" \
+RESPONSE=$(run_curl -w "\n%{http_code}" -X GET "$API_URL/wallet/transactions" \
   -H "Authorization: Bearer $TOKEN")
 HTTP_CODE=$(echo "$RESPONSE" | tail -1)
 BODY=$(echo "$RESPONSE" | sed '$d')
@@ -301,7 +301,7 @@ RESPONSE=$(run_curl -X POST "$API_URL/auth/register" -d '{"name":"Charlie","emai
 CHARLIE_TOKEN=$(echo "$RESPONSE" | jq -r '.token')
 CHARLIE_WALLET=$(echo "$RESPONSE" | jq -r '.wallet_id')
 UUID_ZERO=$(cat /proc/sys/kernel/random/uuid)
-RESPONSE=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/wallets/$CHARLIE_WALLET/withdraw" -H "Authorization: Bearer $CHARLIE_TOKEN" -H "Idempotency-Key: $UUID_ZERO" -d '{"amount":"10.00"}')
+RESPONSE=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/wallet/withdraw" -H "Authorization: Bearer $CHARLIE_TOKEN" -H "Idempotency-Key: $UUID_ZERO" -d '{"amount":"10.00"}')
 HTTP_CODE=$(echo "$RESPONSE" | tail -1)
 assert_http_code "422" "$HTTP_CODE" "Zero balance withdraw"
 
@@ -324,7 +324,7 @@ echo ">>> TEST 22: Medium Amount Transfer"
 echo "==================================================================="
 # Deposit R$ 4000 to Alice (Alice already has ~R$550 from previous tests)
 UUID_LARGE=$(cat /proc/sys/kernel/random/uuid)
-run_curl -X POST "$API_URL/wallets/$ALICE_WALLET/deposit" -H "Authorization: Bearer $ALICE_TOKEN" -H "Idempotency-Key: $UUID_LARGE" -d '{"amount":"4000.00"}' > /dev/null
+run_curl -X POST "$API_URL/wallet/deposit" -H "Authorization: Bearer $ALICE_TOKEN" -H "Idempotency-Key: $UUID_LARGE" -d '{"amount":"4000.00"}' > /dev/null
 # Transfer R$ 2000 to Bob (within R$ 5k daily limit)
 UUID_TRF=$(cat /proc/sys/kernel/random/uuid)
 RESPONSE=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/transfers" -H "Authorization: Bearer $ALICE_TOKEN" -H "Idempotency-Key: $UUID_TRF" -d '{"recipient_email":"bob@test.com","amount":"2000.00"}')
@@ -342,7 +342,7 @@ UUID_META=$(cat /proc/sys/kernel/random/uuid)
 RESPONSE=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/transfers" -H "Authorization: Bearer $ALICE_TOKEN" -H "Idempotency-Key: $UUID_META" -d '{"recipient_email":"bob@test.com","amount":"5.00","metadata":{"description":"Test payment"}}')
 HTTP_CODE=$(echo "$RESPONSE" | tail -1)
 assert_http_code "200" "$HTTP_CODE" "Transfer with metadata"
-RESPONSE=$(run_curl -X GET "$API_URL/wallets/$ALICE_WALLET/transactions" -H "Authorization: Bearer $ALICE_TOKEN")
+RESPONSE=$(run_curl -X GET "$API_URL/wallet/transactions" -H "Authorization: Bearer $ALICE_TOKEN")
 if echo "$RESPONSE" | jq -e '.[] | select(.metadata.description == "Test payment")' > /dev/null 2>&1; then
     TESTS_TOTAL=$((TESTS_TOTAL + 1))
     TESTS_PASSED=$((TESTS_PASSED + 1))

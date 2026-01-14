@@ -7,6 +7,7 @@ namespace App\Infrastructure\Http\Exceptions;
 use App\Domain\Shared\Exceptions\InternalServerErrorException;
 use App\Domain\User\Exceptions\InvalidCredentialsException;
 use App\Domain\User\Exceptions\InvalidEmailException;
+use App\Domain\User\Exceptions\UserAlreadyExistsException;
 use App\Domain\User\Exceptions\InvalidPasswordException;
 use App\Domain\User\Exceptions\InvalidUserNameException;
 use App\Domain\User\Exceptions\UserNotExistsException;
@@ -108,6 +109,11 @@ final class ExceptionHandler
 
     private function registerConflictExceptions(LaravelExceptionHandler $handler): void
     {
+        $handler->renderable(fn (UserAlreadyExistsException $e, Request $r): JsonResponse => response()->json(
+            ['error' => $e->getMessage()],
+            Response::HTTP_CONFLICT
+        ));
+
         $handler->renderable(fn (UserNotExistsException $e, Request $r): JsonResponse => response()->json(
             ['error' => $e->getMessage()],
             Response::HTTP_CONFLICT

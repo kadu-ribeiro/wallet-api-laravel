@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Domain\Wallet\Aggregates\WalletAggregate;
 use App\Infrastructure\Persistence\Eloquent\User;
+use Illuminate\Support\Str;
 
 test('authenticated user can get their data', function (): void {
     $registerResponse = $this->postJson('/api/auth/register', [
@@ -18,15 +19,13 @@ test('authenticated user can get their data', function (): void {
     $userId = $registerResponse->json('user.id');
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
-        ->getJson('/api/user')
-    ;
+        ->getJson('/api/user');
 
     $response->assertOk()
         ->assertJsonPath('data.id', $userId)
         ->assertJsonPath('data.name', 'Test User')
         ->assertJsonPath('data.email', 'test@example.com')
-        ->assertJsonPath('data.wallet_id', $walletId)
-    ;
+        ->assertJsonPath('data.wallet_id', $walletId);
 });
 
 test('unauthenticated user cannot get user data', function (): void {
@@ -46,8 +45,7 @@ test('can get current user wallet', function (): void {
     $token = $registerResponse->json('token');
 
     $response = $this->withHeader('Authorization', "Bearer {$token}")
-        ->getJson('/api/user/wallet')
-    ;
+        ->getJson('/api/wallet');
 
     $response->assertOk()
         ->assertJsonStructure([
@@ -57,12 +55,11 @@ test('can get current user wallet', function (): void {
                 'balance',
                 'currency',
             ],
-        ])
-    ;
+        ]);
 });
 
-test('unauthenticated user cannot get current user wallet', function (): void {
-    $response = $this->getJson('/api/user/wallet');
+test('unauthenticated user cannot get wallet', function (): void {
+    $response = $this->getJson('/api/wallet');
 
     $response->assertUnauthorized();
 });
@@ -72,30 +69,26 @@ test('authenticated user can get their own data via usecase', function (): void 
 
     WalletAggregate::retrieve($user->id)
         ->createWallet($user->id, 'BRL')
-        ->persist()
-    ;
+        ->persist();
 
     $token = $user->createToken('test')->plainTextToken;
 
     $this->withToken($token)
         ->getJson('/api/user')
         ->assertStatus(200)
-        ->assertJsonPath('data.email', $user->email)
-    ;
+        ->assertJsonPath('data.email', $user->email);
 });
 
-test('can retrieve current user wallet via actingAs', function (): void {
+test('can retrieve wallet via actingAs', function (): void {
     $user = User::factory()->create();
     $walletId = Str::uuid()->toString();
 
     WalletAggregate::retrieve($walletId)
         ->createWallet($user->id)
-        ->persist()
-    ;
+        ->persist();
 
     $this->actingAs($user)
-        ->getJson('/api/user/wallet')
+        ->getJson('/api/wallet')
         ->assertStatus(200)
-        ->assertJsonPath('data.user_id', $user->id)
-    ;
+        ->assertJsonPath('data.user_id', $user->id);
 });

@@ -107,7 +107,6 @@ docker-compose up -d
 # Run migrations
 docker-compose exec laravel php artisan migrate
 
-# You're ready to go!
 # API: http://localhost:8080
 # Email viewer (Mailpit): http://localhost:8025
 ```
@@ -191,14 +190,14 @@ Endpoint to query the balance of the authenticated user.
 - **Use Case:** `src/Application/UseCases/Wallet/GetBalanceUseCase.php`
 - **Query:** `src/Infrastructure/Persistence/Queries/WalletQuery.php`
 - **Controller:** `src/Infrastructure/Http/Controllers/WalletController.php` → `balance()`
-- **Route:** `GET /api/wallets/{walletId}/balance`
+- **Route:** `GET /api/wallet/balance`
 
 **How it works:**
 The balance is read from the optimized read model (wallets table) which is kept up-to-date by the `WalletProjector` listening to wallet events.
 
 **Example:**
 ```bash
-curl -X GET http://localhost:8080/api/wallets/{walletId}/balance \
+curl -X GET http://localhost:8080/api/wallet/balance \
   -H "Authorization: Bearer {token}"
 ```
 
@@ -220,7 +219,7 @@ Endpoint to deposit money into the authenticated user's wallet. Amount must be p
 - **Use Case:** `src/Application/UseCases/Wallet/DepositMoneyUseCase.php`
 - **Aggregate:** `src/Domain/Wallet/Aggregates/WalletAggregate.php`
 - **Controller:** `src/Infrastructure/Http/Controllers/WalletController.php` → `deposit()`
-- **Route:** `POST /api/wallets/{walletId}/deposit`
+- **Route:** `POST /api/wallet/deposit`
 - **Event Emitted:** `MoneyDeposited`
 - **Idempotency:** Required via `Idempotency-Key` header
 
@@ -229,7 +228,7 @@ The `Idempotency-Key` header prevents duplicate operations in case of network is
 
 **Example:**
 ```bash
-curl -X POST http://localhost:8080/api/wallets/{walletId}/deposit \
+curl -X POST http://localhost:8080/api/wallet/deposit \
   -H "Authorization: Bearer {token}" \
   -H "Idempotency-Key: 550e8400-e29b-41d4-a716-446655440000" \
   -H "Content-Type: application/json" \
@@ -260,7 +259,7 @@ Endpoint to withdraw money from the authenticated user's wallet. Validate suffic
 - **Use Case:** `src/Application/UseCases/Wallet/WithdrawMoneyUseCase.php`
 - **Aggregate:** `src/Domain/Wallet/Aggregates/WalletAggregate.php`
 - **Controller:** `src/Infrastructure/Http/Controllers/WalletController.php` → `withdraw()`
-- **Route:** `POST /api/wallets/{walletId}/withdraw`
+- **Route:** `POST /api/wallet/withdraw`
 - **Event Emitted:** `MoneyWithdrawn`
 - **Validations:** 
   - Balance check: `ensureSufficientBalance()`
@@ -269,7 +268,7 @@ Endpoint to withdraw money from the authenticated user's wallet. Validate suffic
 
 **Example:**
 ```bash
-curl -X POST http://localhost:8080/api/wallets/{walletId}/withdraw \
+curl -X POST http://localhost:8080/api/wallet/withdraw \
   -H "Authorization: Bearer {token}" \
   -H "Idempotency-Key: 650e8400-e29b-41d4-a716-446655440001" \
   -H "Content-Type: application/json" \
@@ -357,7 +356,7 @@ Endpoint to list all transactions for the authenticated user's wallet.
 - **Use Case:** `src/Application/UseCases/Wallet/GetTransactionHistoryUseCase.php`
 - **Query:** `src/Infrastructure/Persistence/Queries/TransactionQuery.php`
 - **Controller:** `src/Infrastructure/Http/Controllers/WalletController.php` → `transactions()`
-- **Route:** `GET /api/wallets/{walletId}/transactions`
+- **Route:** `GET /api/wallet/transactions`
 - **Projection:** Read model updated by `TransactionProjector`
 
 **How it works:**
@@ -365,7 +364,7 @@ Every time a wallet event occurs (deposit, withdrawal, transfer), the `Transacti
 
 **Example:**
 ```bash
-curl -X GET http://localhost:8080/api/wallets/{walletId}/transactions \
+curl -X GET http://localhost:8080/api/wallet/transactions \
   -H "Authorization: Bearer {token}"
 ```
 
@@ -534,12 +533,11 @@ The idempotency key is stored in the transactions table. The database enforces u
 | POST | `/auth/login` | Login user | No | No |
 | POST | `/auth/logout` | Logout user | Yes | No |
 | GET | `/user` | Get authenticated user info | Yes | No |
-| GET | `/user/wallet` | Get current user's wallet | Yes | No |
-| GET | `/wallets/{walletId}` | Get wallet details | Yes | No |
-| GET | `/wallets/{walletId}/balance` | Get wallet balance | Yes | No |
-| GET | `/wallets/{walletId}/transactions` | Get transaction history | Yes | No |
-| POST | `/wallets/{walletId}/deposit` | Deposit money | Yes | Yes |
-| POST | `/wallets/{walletId}/withdraw` | Withdraw money | Yes | Yes |
+| GET | `/wallet` | Get current user's wallet | Yes | No |
+| GET | `/wallet/balance` | Get wallet balance | Yes | No |
+| GET | `/wallet/transactions` | Get transaction history | Yes | No |
+| POST | `/wallet/deposit` | Deposit money | Yes | Yes |
+| POST | `/wallet/withdraw` | Withdraw money | Yes | Yes |
 | POST | `/transfers` | Transfer money | Yes | Yes |
 
 ### Error Responses
@@ -750,7 +748,7 @@ This project implements concepts from the following literature:
 5. **Understand read models:** Check `src/Infrastructure/Projectors/` for how data is projected
 
 **Example flow for a deposit:**
-1. `POST /api/wallets/{id}/deposit` (defined in `Application.php`)
+1. `POST /api/wallet/deposit` (defined in `Application.php`)
 2. `WalletController::deposit()` validates auth and extracts data
 3. `DepositMoneyUseCase` orchestrates the operation
 4. `WalletAggregate` applies business rules and emits `MoneyDeposited` event

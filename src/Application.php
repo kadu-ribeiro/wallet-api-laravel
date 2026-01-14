@@ -17,7 +17,6 @@ use App\Infrastructure\Http\Controllers\TransferController;
 use App\Infrastructure\Http\Controllers\UserController;
 use App\Infrastructure\Http\Controllers\WalletController;
 use App\Infrastructure\Http\Exceptions\ExceptionHandler;
-use App\Infrastructure\Http\Middleware\EnsureWalletOwnership;
 use App\Infrastructure\Http\Middleware\ValidateIdempotencyKey;
 use App\Infrastructure\Persistence\Queries\TransactionQuery;
 use App\Infrastructure\Persistence\Queries\WalletQuery;
@@ -72,24 +71,20 @@ class Application extends ServiceProvider
                 Route::middleware('auth:sanctum')->group(function (): void {
                     Route::get('user', [UserController::class, 'show']);
                     Route::post('auth/logout', [UserController::class, 'logout']);
-                    Route::get('user/wallet', [WalletController::class, 'showCurrentUserWallet']);
 
-                    Route::prefix('wallets/{walletId}')->group(function (): void {
+                    Route::prefix('wallet')->group(function (): void {
                         Route::get('/', [WalletController::class, 'show']);
                         Route::get('balance', [WalletController::class, 'show']);
                         Route::get('transactions', [WalletController::class, 'transactions']);
 
                         Route::post('deposit', [WalletController::class, 'deposit'])
-                            ->middleware(ValidateIdempotencyKey::class)
-                        ;
+                            ->middleware(ValidateIdempotencyKey::class);
                         Route::post('withdraw', [WalletController::class, 'withdraw'])
-                            ->middleware(ValidateIdempotencyKey::class)
-                        ;
-                    })->middleware(EnsureWalletOwnership::class);
+                            ->middleware(ValidateIdempotencyKey::class);
+                    });
 
                     Route::post('transfers', [TransferController::class, 'store'])
-                        ->middleware(ValidateIdempotencyKey::class)
-                    ;
+                        ->middleware(ValidateIdempotencyKey::class);
                 });
             })
         ;

@@ -30,11 +30,6 @@ final class DepositRequest extends FormRequest
         ];
     }
 
-    public function walletId(): string
-    {
-        return $this->route('walletId');
-    }
-
     public function idempotencyKey(): string
     {
         return $this->header('Idempotency-Key', '');

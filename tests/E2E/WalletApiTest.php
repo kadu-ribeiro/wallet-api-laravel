@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Domain\Wallet\Aggregates\WalletAggregate;
 use App\Infrastructure\Persistence\Eloquent\User;
-use App\Infrastructure\Persistence\Eloquent\Wallet;
 use Illuminate\Support\Str;
 
 beforeEach(function (): void {
@@ -12,38 +12,30 @@ beforeEach(function (): void {
 
 test('wallet balance endpoint returns balance data', function (): void {
     $user = User::factory()->create();
-    $wallet = Wallet::create([
-        'id' => Str::uuid()->toString(),
-        'user_id' => $user->id,
-        'balance_cents' => 25000,
-        'currency' => 'BRL',
-    ]);
+    $walletId = Str::uuid()->toString();
+    WalletAggregate::retrieve($walletId)
+        ->createWallet($user->id)
+        ->persist();
 
     $response = $this->actingAs($user)
-        ->getJson("/api/wallets/{$wallet->id}/balance")
-    ;
+        ->getJson('/api/wallet/balance');
 
     $response->assertStatus(200)
-        ->assertJsonStructure(['data' => ['balance', 'currency']])
-    ;
+        ->assertJsonStructure(['data' => ['balance', 'currency']]);
 });
 
 test('wallet transactions endpoint returns data', function (): void {
     $user = User::factory()->create();
-    $wallet = Wallet::create([
-        'id' => Str::uuid()->toString(),
-        'user_id' => $user->id,
-        'balance_cents' => 10000,
-        'currency' => 'BRL',
-    ]);
+    $walletId = Str::uuid()->toString();
+    WalletAggregate::retrieve($walletId)
+        ->createWallet($user->id)
+        ->persist();
 
     $response = $this->actingAs($user)
-        ->getJson("/api/wallets/{$wallet->id}/transactions")
-    ;
+        ->getJson('/api/wallet/transactions');
 
     $response->assertStatus(200)
-        ->assertJsonIsArray()
-    ;
+        ->assertJsonIsArray();
 });
 
 test('transfer endpoint requires authentication', function (): void {
@@ -72,34 +64,27 @@ test('logout requires authentication', function (): void {
 
 test('authenticated user can access protected routes', function (): void {
     $user = User::factory()->create();
-    $wallet = Wallet::create([
-        'id' => Str::uuid()->toString(),
-        'user_id' => $user->id,
-        'balance_cents' => 5000,
-        'currency' => 'BRL',
-    ]);
+    $walletId = Str::uuid()->toString();
+    WalletAggregate::retrieve($walletId)
+        ->createWallet($user->id)
+        ->persist();
 
     $response = $this->actingAs($user)
-        ->getJson("/api/wallets/{$wallet->id}")
-    ;
+        ->getJson('/api/wallet');
 
     $response->assertStatus(200);
 });
 
 test('wallet show endpoint returns wallet details', function (): void {
     $user = User::factory()->create();
-    $wallet = Wallet::create([
-        'id' => Str::uuid()->toString(),
-        'user_id' => $user->id,
-        'balance_cents' => 12345,
-        'currency' => 'BRL',
-    ]);
+    $walletId = Str::uuid()->toString();
+    WalletAggregate::retrieve($walletId)
+        ->createWallet($user->id)
+        ->persist();
 
     $response = $this->actingAs($user)
-        ->getJson("/api/wallets/{$wallet->id}")
-    ;
+        ->getJson('/api/wallet');
 
     $response->assertStatus(200)
-        ->assertJsonStructure(['data'])
-    ;
+        ->assertJsonStructure(['data']);
 });
