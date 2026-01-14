@@ -7,8 +7,10 @@ namespace Tests;
 use App\Application\Contracts\Wallet\TransactionFinderInterface;
 use App\Application\Contracts\Wallet\WalletFinderInterface;
 use App\Domain\User\Repositories\UserRepositoryInterface;
+use App\Domain\User\Services\AuthenticationServiceInterface;
 use App\Domain\Wallet\Repositories\TransactionRepositoryInterface;
 use App\Domain\Wallet\Repositories\WalletRepositoryInterface;
+use App\Infrastructure\Auth\SanctumAuthenticationService;
 use App\Infrastructure\Persistence\Finders\EloquentTransactionFinder;
 use App\Infrastructure\Persistence\Finders\EloquentWalletFinder;
 use App\Infrastructure\Persistence\Repositories\TransactionRepository;
@@ -29,7 +31,7 @@ abstract class TestCase extends BaseTestCase
         $app->bind(UserRepositoryInterface::class, UserRepository::class);
         $app->bind(WalletRepositoryInterface::class, WalletRepository::class);
         $app->bind(TransactionRepositoryInterface::class, TransactionRepository::class);
-        $app->bind(\App\Domain\User\Services\AuthenticationServiceInterface::class, \App\Infrastructure\Auth\SanctumAuthenticationService::class);
+        $app->bind(AuthenticationServiceInterface::class, SanctumAuthenticationService::class);
         $app->bind(WalletFinderInterface::class, EloquentWalletFinder::class);
         $app->bind(TransactionFinderInterface::class, EloquentTransactionFinder::class);
 

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Application\UseCases\Wallet;
 
 use App\Application\Contracts\Wallet\DepositMoneyUseCaseInterface;
-use App\Application\DTOs\Wallet\DepositResultDTO;
 use App\Application\DTOs\Wallet\DepositMoneyDTO;
+use App\Application\DTOs\Wallet\DepositResultDTO;
 use App\Domain\Wallet\Aggregates\WalletAggregate;
 use App\Domain\Wallet\Exceptions\InvalidAmountException;
 use App\Domain\Wallet\Exceptions\TransferAlreadyProcessedException;

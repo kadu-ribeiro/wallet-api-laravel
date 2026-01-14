@@ -28,6 +28,7 @@ final readonly class TransactionQuery implements TransactionQueryInterface
                 relatedTransactionId: $tx->related_transaction_id ? (int) $tx->related_transaction_id : null,
                 metadata: $tx->metadata ?? [],
                 createdAt: $tx->created_at->toIso8601String()
-            ));
+            ))
+        ;
     }
 }

@@ -10,9 +10,7 @@ use App\Domain\User\Exceptions\InvalidCredentialsException;
 use App\Domain\User\Repositories\UserRepositoryInterface;
 use App\Domain\User\Services\AuthenticationServiceInterface;
 use App\Domain\User\ValueObjects\Email;
-use App\Domain\User\ValueObjects\UserId;
 use App\Domain\Wallet\Repositories\WalletRepositoryInterface;
-use Illuminate\Support\Facades\Hash;
 
 final readonly class LoginUserUseCase implements LoginUserUseCaseInterface
 {
@@ -25,9 +23,9 @@ final readonly class LoginUserUseCase implements LoginUserUseCaseInterface
     public function execute(string $email, string $password): AuthResultDTO
     {
         $emailVO = Email::from($email);
-        
+
         $userId = $this->authService->verifyPassword($emailVO, $password);
-        
+
         if (! $userId) {
             throw InvalidCredentialsException::create();
         }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Domain\Wallet\Aggregates\WalletAggregate;
 use App\Infrastructure\Persistence\Eloquent\User;
-use App\Infrastructure\Persistence\Eloquent\Wallet;
 
 test('authenticated user can get their data', function (): void {
     $registerResponse = $this->postJson('/api/auth/register', [
@@ -92,11 +91,12 @@ test('unauthenticated user cannot get wallet by user id', function (): void {
 
 test('authenticated user can get their own data via usecase', function (): void {
     $user = User::factory()->create();
-    
+
     WalletAggregate::retrieve($user->id)
         ->createWallet($user->id, 'BRL')
-        ->persist();
-    
+        ->persist()
+    ;
+
     $token = $user->createToken('test')->plainTextToken;
 
     $this->withToken($token)
@@ -118,5 +118,6 @@ test('can retrieve wallet by user id', function (): void {
     $this->actingAs($user)
         ->getJson("/api/users/{$user->id}/wallet")
         ->assertStatus(200)
-        ->assertJsonPath('data.user_id', $user->id);
+        ->assertJsonPath('data.user_id', $user->id)
+    ;
 });

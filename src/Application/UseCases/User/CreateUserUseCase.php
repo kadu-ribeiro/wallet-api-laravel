@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Application\UseCases\User;
 
 use App\Application\Contracts\User\CreateUserUseCaseInterface;
-use App\Application\DTOs\User\CreateUserDTO;
 use App\Application\DTOs\User\AuthResultDTO;
+use App\Application\DTOs\User\CreateUserDTO;
 use App\Application\DTOs\Wallet\CreateWalletDTO;
 use App\Application\UseCases\Wallet\CreateWalletUseCase;
 use App\Domain\User\Aggregates\UserAggregate;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Wallet\Repositories;
 
-use App\Domain\Wallet\DTOs\WalletDTO;
 use App\Domain\User\ValueObjects\UserId;
+use App\Domain\Wallet\DTOs\WalletDTO;
 use App\Domain\Wallet\ValueObjects\WalletId;
 
 interface WalletRepositoryInterface

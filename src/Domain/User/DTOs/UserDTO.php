@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Domain\User\DTOs;
 
-use App\Domain\User\ValueObjects\{Email, UserId};
+use App\Domain\User\ValueObjects\Email;
+use App\Domain\User\ValueObjects\UserId;
 use App\Domain\Wallet\ValueObjects\WalletId;
+use DateTimeImmutable;
 
 final readonly class UserDTO
 {
@@ -14,7 +16,7 @@ final readonly class UserDTO
         public string $name,
         public Email $email,
         public ?WalletId $walletId,
-        public \DateTimeImmutable $createdAt
+        public DateTimeImmutable $createdAt
     ) {}
 
     public static function fromPrimitives(
@@ -29,7 +31,7 @@ final readonly class UserDTO
             name: $name,
             email: Email::from($email),
             walletId: $walletId ? new WalletId($walletId) : null,
-            createdAt: new \DateTimeImmutable($createdAt)
+            createdAt: new DateTimeImmutable($createdAt)
         );
     }
 

@@ -15,12 +15,12 @@ interface UserRepositoryInterface
     public function findByEmail(Email $email): ?UserDTO;
 
     public function emailExists(Email $email): bool;
-    
+
     public function createToken(UserId $userId, string $tokenName): string;
-    
+
     public function revokeCurrentToken(UserId $userId): void;
-    
+
     public function revokeAllTokens(UserId $userId): void;
-    
+
     public function verifyPassword(Email $email, string $password): ?UserId;
 }

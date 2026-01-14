@@ -14,7 +14,7 @@ final readonly class SanctumAuthenticationService implements AuthenticationServi
     public function __construct(
         private UserRepositoryInterface $userRepository
     ) {}
-    
+
     public function createToken(UserId $userId, string $tokenName): string
     {
         return $this->userRepository->createToken($userId, $tokenName);

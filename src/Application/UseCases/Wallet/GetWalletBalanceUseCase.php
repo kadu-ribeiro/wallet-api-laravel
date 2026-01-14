@@ -6,8 +6,8 @@ namespace App\Application\UseCases\Wallet;
 
 use App\Application\Contracts\Wallet\GetWalletBalanceUseCaseInterface;
 use App\Domain\Wallet\DTOs\WalletDTO;
-use App\Domain\Wallet\Queries\WalletQueryInterface;
 use App\Domain\Wallet\Exceptions\WalletNotFoundException;
+use App\Domain\Wallet\Queries\WalletQueryInterface;
 
 final readonly class GetWalletBalanceUseCase implements GetWalletBalanceUseCaseInterface
 {

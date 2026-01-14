@@ -21,7 +21,7 @@ enum TransactionType: string
 
     public function isCredit(): bool
     {
-        return !$this->isDebit();
+        return ! $this->isDebit();
     }
 
     public function label(): string

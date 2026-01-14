@@ -6,7 +6,6 @@ namespace App\Infrastructure\Persistence\Queries;
 
 use App\Domain\Wallet\DTOs\WalletDTO;
 use App\Domain\Wallet\Queries\WalletQueryInterface;
-use App\Domain\Wallet\ValueObjects\Money;
 use App\Infrastructure\Persistence\Eloquent\Wallet;
 
 final readonly class WalletQuery implements WalletQueryInterface

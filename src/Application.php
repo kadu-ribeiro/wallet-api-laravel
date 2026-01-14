@@ -5,17 +5,19 @@ declare(strict_types=1);
 namespace App;
 
 use App\Domain\User\Repositories\UserRepositoryInterface;
+use App\Domain\User\Services\AuthContextInterface;
 use App\Domain\User\Services\AuthenticationServiceInterface;
 use App\Domain\Wallet\Queries\TransactionQueryInterface;
 use App\Domain\Wallet\Queries\WalletQueryInterface;
 use App\Domain\Wallet\Repositories\TransactionRepositoryInterface;
 use App\Domain\Wallet\Repositories\WalletRepositoryInterface;
+use App\Infrastructure\Auth\LaravelAuthenticatedUserProvider;
+use App\Infrastructure\Auth\SanctumAuthenticationService;
 use App\Infrastructure\Http\Controllers\TransferController;
 use App\Infrastructure\Http\Controllers\UserController;
 use App\Infrastructure\Http\Controllers\WalletController;
 use App\Infrastructure\Http\Exceptions\ExceptionHandler;
 use App\Infrastructure\Http\Middleware\ValidateIdempotencyKey;
-use App\Infrastructure\Auth\SanctumAuthenticationService;
 use App\Infrastructure\Persistence\Queries\TransactionQuery;
 use App\Infrastructure\Persistence\Queries\WalletQuery;
 use App\Infrastructure\Persistence\Repositories\TransactionRepository;
@@ -44,8 +46,8 @@ class Application extends ServiceProvider
         $this->app->bind(WalletQueryInterface::class, WalletQuery::class);
         $this->app->bind(AuthenticationServiceInterface::class, SanctumAuthenticationService::class);
         $this->app->bind(
-            \App\Domain\User\Services\AuthContextInterface::class,
-            \App\Infrastructure\Auth\LaravelAuthenticatedUserProvider::class
+            AuthContextInterface::class,
+            LaravelAuthenticatedUserProvider::class
         );
     }
 

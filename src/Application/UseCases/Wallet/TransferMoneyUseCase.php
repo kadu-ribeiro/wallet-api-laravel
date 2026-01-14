@@ -7,7 +7,6 @@ namespace App\Application\UseCases\Wallet;
 use App\Application\Contracts\Wallet\TransferMoneyUseCaseInterface;
 use App\Application\DTOs\Wallet\TransferMoneyDTO;
 use App\Application\DTOs\Wallet\TransferResultDTO;
-use App\Domain\User\Exceptions\UserNotExistsException;
 use App\Domain\User\Repositories\UserRepositoryInterface;
 use App\Domain\User\ValueObjects\Email;
 use App\Domain\User\ValueObjects\UserId;

@@ -3,9 +3,10 @@
 declare(strict_types=1);
 
 namespace App\Application\UseCases\Wallet;
+
 use App\Domain\Wallet\DTOs\WalletDTO;
-use App\Domain\Wallet\Queries\WalletQueryInterface;
 use App\Domain\Wallet\Exceptions\WalletNotFoundException;
+use App\Domain\Wallet\Queries\WalletQueryInterface;
 
 final readonly class GetWalletByUserIdUseCase
 {

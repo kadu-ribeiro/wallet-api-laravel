@@ -7,6 +7,7 @@ namespace App\Application\UseCases\User;
 use App\Domain\User\DTOs\UserDTO;
 use App\Domain\User\Repositories\UserRepositoryInterface;
 use App\Domain\User\Services\AuthContextInterface;
+use RuntimeException;
 
 final readonly class GetCurrentUserUseCase
 {
@@ -19,11 +20,11 @@ final readonly class GetCurrentUserUseCase
     {
         $userId = $this->authContext->getUserId();
         $user = $this->userRepository->findById($userId);
-        
+
         if (! $user) {
-            throw new \RuntimeException('Authenticated user not found');
+            throw new RuntimeException('Authenticated user not found');
         }
-        
+
         return $user;
     }
 }

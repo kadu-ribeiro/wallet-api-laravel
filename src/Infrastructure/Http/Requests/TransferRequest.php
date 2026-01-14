@@ -14,7 +14,7 @@ final class TransferRequest extends FormRequest
     ) {
         parent::__construct();
     }
-    
+
     public function authorize(): bool
     {
         return true;

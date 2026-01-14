@@ -66,7 +66,7 @@ final readonly class TransactionDTO
             'currency' => $this->currency->value,
             'related_user_email' => $this->relatedUserEmail?->value,
             'related_transaction_id' => $this->relatedTransactionId?->value,
-            'metadata' => empty($this->metadata) ? (object)[] : $this->metadata,
+            'metadata' => empty($this->metadata) ? (object) [] : $this->metadata,
             'created_at' => $this->createdAt->format('Y-m-d\TH:i:s\Z'),
         ];
     }

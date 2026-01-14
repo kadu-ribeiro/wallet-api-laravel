@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Domain\Wallet\Aggregates\WalletAggregate;
 use App\Infrastructure\Persistence\Eloquent\User;
+use App\Infrastructure\Persistence\Eloquent\Wallet;
 use Illuminate\Support\Str;
 
 beforeEach(function (): void {
@@ -21,20 +22,24 @@ test('deposit without idempotency key returns 400', function (): void {
     $response = $this->withToken($this->token)
         ->postJson("/api/wallets/{$this->walletId}/deposit", [
             'amount' => '100.00',
-        ]);
+        ])
+    ;
 
     $response->assertStatus(400)
-        ->assertJson(['error' => 'Idempotency-Key header is required for this operation']);
+        ->assertJson(['error' => 'Idempotency-Key header is required for this operation'])
+    ;
 });
 
 test('deposit with invalid idempotency key returns 422', function (): void {
     $response = $this->withToken($this->token)
         ->postJson("/api/wallets/{$this->walletId}/deposit", [
             'amount' => '100.00',
-        ], ['Idempotency-Key' => 'not-a-uuid']);
+        ], ['Idempotency-Key' => 'not-a-uuid'])
+    ;
 
     $response->assertStatus(422)
-        ->assertJson(['error' => 'Idempotency-Key must be a valid UUID']);
+        ->assertJson(['error' => 'Idempotency-Key must be a valid UUID'])
+    ;
 });
 
 test('deposit with valid idempotency key succeeds', function (): void {
@@ -43,13 +48,15 @@ test('deposit with valid idempotency key succeeds', function (): void {
     $response = $this->withToken($this->token)
         ->postJson("/api/wallets/{$this->walletId}/deposit", [
             'amount' => '100.00',
-        ], ['Idempotency-Key' => $key]);
+        ], ['Idempotency-Key' => $key])
+    ;
 
     $response->assertStatus(200)
         ->assertJsonStructure([
             'message',
             'wallet' => ['id', 'balance_cents', 'balance', 'currency'],
-        ]);
+        ])
+    ;
 });
 
 test('repeated transfer with same idempotency key is rejected with 409', function (): void {
@@ -71,7 +78,8 @@ test('repeated transfer with same idempotency key is rejected with 409', functio
     $this->withToken($senderToken)
         ->postJson("/api/wallets/{$senderWalletId}/deposit", [
             'amount' => '100.00',
-        ], ['Idempotency-Key' => Str::uuid()->toString()]);
+        ], ['Idempotency-Key' => Str::uuid()->toString()])
+    ;
 
     $key = Str::uuid()->toString();
 
@@ -79,7 +87,8 @@ test('repeated transfer with same idempotency key is rejected with 409', functio
         ->postJson('/api/transfers', [
             'recipient_email' => $recipient->email,
             'amount' => '50.00',
-        ], ['Idempotency-Key' => $key]);
+        ], ['Idempotency-Key' => $key])
+    ;
 
     $response1->assertStatus(200);
 
@@ -87,10 +96,11 @@ test('repeated transfer with same idempotency key is rejected with 409', functio
         ->postJson('/api/transfers', [
             'recipient_email' => $recipient->email,
             'amount' => '50.00',
-        ], ['Idempotency-Key' => $key]);
+        ], ['Idempotency-Key' => $key])
+    ;
 
     $response2->assertStatus(409);
 
-    $senderWallet = \App\Infrastructure\Persistence\Eloquent\Wallet::find($senderWalletId);
+    $senderWallet = Wallet::find($senderWalletId);
     expect($senderWallet->balance_cents)->toBe(5000);
 });

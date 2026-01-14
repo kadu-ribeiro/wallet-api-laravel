@@ -100,5 +100,6 @@ test('wallet show endpoint returns wallet details', function (): void {
     ;
 
     $response->assertStatus(200)
-        ->assertJsonStructure(['data']);
+        ->assertJsonStructure(['data'])
+    ;
 });

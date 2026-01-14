@@ -11,6 +11,7 @@ use App\Domain\User\ValueObjects\Email;
 use App\Domain\User\ValueObjects\UserId;
 use App\Domain\Wallet\ValueObjects\WalletId;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use RuntimeException;
 
 final readonly class LaravelAuthenticatedUserProvider implements AuthContextInterface
 {
@@ -18,45 +19,46 @@ final readonly class LaravelAuthenticatedUserProvider implements AuthContextInte
         private AuthFactory $auth,
         private UserRepositoryInterface $userRepository
     ) {}
-    
+
     public function getUserId(): UserId
     {
         $id = $this->auth->guard('sanctum')->id();
-        
+
         if (! $id) {
-            throw new \RuntimeException('No authenticated user');
+            throw new RuntimeException('No authenticated user');
         }
-        
+
         return new UserId((string) $id);
     }
-    
+
     public function getEmail(): Email
     {
         $userId = $this->getUserId();
         $user = $this->userRepository->findById($userId);
-        
+
         if (! $user) {
-            throw new \RuntimeException('Authenticated user not found');
+            throw new RuntimeException('Authenticated user not found');
         }
-        
+
         $userData = $user->toArray();
+
         return Email::from($userData['email']);
     }
-    
+
     public function getWalletId(): WalletId
     {
         $userId = $this->getUserId();
         $user = $this->userRepository->findById($userId);
-        
+
         $userData = $user?->toArray();
-        
+
         if (! $user || ! $userData['wallet_id']) {
             throw UserHasNoWalletException::create();
         }
-        
+
         return new WalletId($userData['wallet_id']);
     }
-    
+
     public function isAuthenticated(): bool
     {
         return $this->auth->guard('sanctum')->check();
