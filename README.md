@@ -736,10 +736,6 @@ This project implements concepts from the following literature:
   - *Concepts:* State changes as immutable events, separating Read (Query) and Write (Command) models.
   - *Implementation:* `src/Infrastructure/Projectors/` (Read Models) vs `src/Domain/*/Aggregates/` (Write Models).
 
-- **[Implementing DDD](https://kalele.io/books/) (Vaughn Vernon)**
-  - *Concepts:* Practical application of persistent models and event dispatching.
-  - *Implementation:* The event lifecycle management and Aggregate design throughout `src/Domain`.
-
 - **[Laravel Event Sourcing](https://spatie.be/docs/laravel-event-sourcing) (Spatie)**
   - *Resources:* [Introductory Video](https://www.youtube.com/watch?v=1VWqmfMEsF8) explaining the package philosophy.
   - *Implementation:* The engine under the hood handling our Event Store and Projectors.
