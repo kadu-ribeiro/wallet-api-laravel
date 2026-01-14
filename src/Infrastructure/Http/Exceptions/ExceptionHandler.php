@@ -116,7 +116,7 @@ final class ExceptionHandler
 
         $handler->renderable(fn (UserNotExistsException $e, Request $r): JsonResponse => response()->json(
             ['error' => $e->getMessage()],
-            Response::HTTP_CONFLICT
+            Response::HTTP_NOT_FOUND
         ));
 
         $handler->renderable(fn (TransferAlreadyProcessedException $e, Request $r): JsonResponse => response()->json(

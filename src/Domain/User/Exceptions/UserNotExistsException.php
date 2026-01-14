@@ -12,4 +12,9 @@ class UserNotExistsException extends Exception
     {
         return new self("User with email {$email} not exists");
     }
+
+    public static function withId(string $id): self
+    {
+        return new self("User with id {$id} not found");
+    }
 }

@@ -86,6 +86,12 @@ class Application extends ServiceProvider
                     Route::post('transfers', [TransferController::class, 'store'])
                         ->middleware(ValidateIdempotencyKey::class);
                 });
+
+                Route::prefix('demo')->group(function (): void {
+                    Route::get('users/{userId}', [UserController::class, 'showById']);
+                    Route::get('wallets/{walletId}', [WalletController::class, 'showById']);
+                    Route::get('wallets/{walletId}/transactions', [WalletController::class, 'transactionsById']);
+                });
             })
         ;
     }

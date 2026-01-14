@@ -540,6 +540,18 @@ The idempotency key is stored in the transactions table. The database enforces u
 | POST | `/wallet/withdraw` | Withdraw money | Yes | Yes |
 | POST | `/transfers` | Transfer money | Yes | Yes |
 
+### Demo Routes (No Authentication)
+
+These routes are provided **for demonstration purposes only**, allowing direct access to user and wallet data without authentication. Use them to validate the system during presentations or personal testing.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/demo/users/{userId}` | Get user by ID |
+| GET | `/demo/wallets/{walletId}` | Get wallet by ID |
+| GET | `/demo/wallets/{walletId}/transactions` | Get wallet transactions |
+
+**Warning:** These routes bypass authentication and should **never** be exposed in production environments.
+
 ### Error Responses
 
 All errors follow a standardized JSON format:

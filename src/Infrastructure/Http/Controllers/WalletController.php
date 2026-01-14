@@ -74,4 +74,21 @@ class WalletController extends Controller
 
         return response()->json($result->toArray());
     }
+
+    public function showById(string $walletId): JsonResponse
+    {
+        $wallet = $this->getWalletBalanceUseCase->execute($walletId);
+
+        return response()->json(['data' => $wallet->toArray()]);
+    }
+
+    public function transactionsById(string $walletId, Request $request): JsonResponse
+    {
+        $perPage = (int) $request->query('per_page', 50);
+        $transactions = $this->getTransactionHistoryUseCase->execute($walletId, $perPage);
+
+        return response()->json(
+            $transactions->map(fn ($tx) => $tx->toArray())->all()
+        );
+    }
 }
