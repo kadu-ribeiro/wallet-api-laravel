@@ -722,6 +722,31 @@ Laravel's default structure mixes infrastructure concerns with business logic. B
 
 The `src/Application.php` service provider is our entry point and makes navigation easier by having all routes in one place.
 
+## Bibliographical References
+
+This project implements concepts from the following literature:
+
+- **[Domain-Driven Design](https://www.domainlanguage.com/ddd/reference/) (Eric Evans)**
+  - *Concepts:* Aggregates, Value Objects, Domain Isolation.
+  - *Implementation:* `src/Domain/` (e.g. `Aggregates/`, `ValueObjects/` independent of framework).
+
+- **[Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) (Robert C. Martin)**
+  - *Concepts:* Layer separation, Dependency Rule (Inner layers know nothing of outer layers).
+  - *Implementation:* Strict separation between `src/Application/` (Use Cases) and `src/Infrastructure/`.
+
+- **[Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html) & [CQRS](https://martinfowler.com/bliki/CQRS.html) (Martin Fowler)**
+  - *Concepts:* State changes as immutable events, separating Read (Query) and Write (Command) models.
+  - *Implementation:* `src/Infrastructure/Projectors/` (Read Models) vs `src/Domain/*/Aggregates/` (Write Models).
+
+- **[Implementing DDD](https://kalele.io/books/) (Vaughn Vernon)**
+  - *Concepts:* Practical application of persistent models and event dispatching.
+  - *Implementation:* The event lifecycle management and Aggregate design throughout `src/Domain`.
+
+- **[Laravel Event Sourcing](https://spatie.be/docs/laravel-event-sourcing) (Spatie)**
+  - *Resources:* [Introductory Video](https://www.youtube.com/watch?v=1VWqmfMEsF8) explaining the package philosophy.
+  - *Implementation:* The engine under the hood handling our Event Store and Projectors.
+
+
 ## How to Navigate the Code
 
 1. **Start with:** `src/Application.php` - All routes are defined here
