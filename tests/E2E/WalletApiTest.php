@@ -15,13 +15,16 @@ test('wallet balance endpoint returns balance data', function (): void {
     $walletId = Str::uuid()->toString();
     WalletAggregate::retrieve($walletId)
         ->createWallet($user->id)
-        ->persist();
+        ->persist()
+    ;
 
     $response = $this->actingAs($user)
-        ->getJson('/api/wallet/balance');
+        ->getJson('/api/wallet/balance')
+    ;
 
     $response->assertStatus(200)
-        ->assertJsonStructure(['data' => ['balance', 'currency']]);
+        ->assertJsonStructure(['data' => ['balance', 'currency']])
+    ;
 });
 
 test('wallet transactions endpoint returns data', function (): void {
@@ -29,13 +32,16 @@ test('wallet transactions endpoint returns data', function (): void {
     $walletId = Str::uuid()->toString();
     WalletAggregate::retrieve($walletId)
         ->createWallet($user->id)
-        ->persist();
+        ->persist()
+    ;
 
     $response = $this->actingAs($user)
-        ->getJson('/api/wallet/transactions');
+        ->getJson('/api/wallet/transactions')
+    ;
 
     $response->assertStatus(200)
-        ->assertJsonIsArray();
+        ->assertJsonIsArray()
+    ;
 });
 
 test('transfer endpoint requires authentication', function (): void {
@@ -67,10 +73,12 @@ test('authenticated user can access protected routes', function (): void {
     $walletId = Str::uuid()->toString();
     WalletAggregate::retrieve($walletId)
         ->createWallet($user->id)
-        ->persist();
+        ->persist()
+    ;
 
     $response = $this->actingAs($user)
-        ->getJson('/api/wallet');
+        ->getJson('/api/wallet')
+    ;
 
     $response->assertStatus(200);
 });
@@ -80,10 +88,12 @@ test('wallet show endpoint returns wallet details', function (): void {
     $walletId = Str::uuid()->toString();
     WalletAggregate::retrieve($walletId)
         ->createWallet($user->id)
-        ->persist();
+        ->persist()
+    ;
 
     $response = $this->actingAs($user)
-        ->getJson('/api/wallet');
+        ->getJson('/api/wallet')
+    ;
 
     $response->assertStatus(200)
         ->assertJsonStructure(['data']);

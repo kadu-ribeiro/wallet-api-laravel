@@ -11,7 +11,6 @@ use App\Application\DTOs\Wallet\CreateWalletDTO;
 use App\Application\UseCases\Wallet\CreateWalletUseCase;
 use App\Domain\User\Aggregates\UserAggregate;
 use App\Domain\User\Exceptions\UserAlreadyExistsException;
-use App\Domain\User\Exceptions\UserNotExistsException;
 use App\Domain\User\Repositories\UserRepositoryInterface;
 use App\Domain\User\Services\AuthenticationServiceInterface;
 use App\Domain\User\ValueObjects\Email;
@@ -21,7 +20,6 @@ use App\Domain\User\ValueObjects\UserName;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Throwable;
 
 final readonly class CreateUserUseCase implements CreateUserUseCaseInterface
 {

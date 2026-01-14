@@ -78,17 +78,22 @@ class Application extends ServiceProvider
                         Route::get('transactions', [WalletController::class, 'transactions']);
 
                         Route::post('deposit', [WalletController::class, 'deposit'])
-                            ->middleware(ValidateIdempotencyKey::class);
+                            ->middleware(ValidateIdempotencyKey::class)
+                        ;
                         Route::post('withdraw', [WalletController::class, 'withdraw'])
-                            ->middleware(ValidateIdempotencyKey::class);
+                            ->middleware(ValidateIdempotencyKey::class)
+                        ;
                     });
 
                     Route::post('transfers', [TransferController::class, 'store'])
-                        ->middleware(ValidateIdempotencyKey::class);
+                        ->middleware(ValidateIdempotencyKey::class)
+                    ;
                 });
 
                 Route::prefix('demo')->group(function (): void {
+                    Route::get('users', [UserController::class, 'index']);
                     Route::get('users/{userId}', [UserController::class, 'showById']);
+                    Route::get('wallets', [WalletController::class, 'index']);
                     Route::get('wallets/{walletId}', [WalletController::class, 'showById']);
                     Route::get('wallets/{walletId}/transactions', [WalletController::class, 'transactionsById']);
                 });

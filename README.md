@@ -404,15 +404,9 @@ curl -X GET http://localhost:8080/api/wallet/transactions \
 ]
 ```
 
-## Additional Features (Bonus)
+## Additional Features
 
 ### Automated Test Coverage
-
-We have comprehensive test coverage using Pest PHP:
-
-**Test Results:**
-- 111 unit/integration/feature tests (196 assertions) - All passing
-- 24 end-to-end tests covering complete user flows - All passing
 
 **Running Tests:**
 ```bash
@@ -431,14 +425,10 @@ docker-compose exec laravel sh tests/e2e_tests.sh
 
 ### Docker Setup
 
-The project is fully containerized with Docker Compose for easy setup:
-
 **Services:**
-- Laravel with Octane (Swoole) for high performance
+- Laravel with Octane
 - Redis for queue and cache
 - Mailpit for email testing (accessible at http://localhost:8025)
-
-No need to install PHP, Composer, or any dependencies locally. Everything runs in containers.
 
 ### Daily Limits
 
@@ -472,7 +462,6 @@ WALLET_WEBHOOK_TRANSFER_URL=https://webhook.site/your-unique-id
 
 **Implementation:**
 - Projector: `src/Infrastructure/Projectors/WebhookProjector.php`
-- Job: `src/Infrastructure/Jobs/SendWebhookJob.php`
 
 **Payload Example:**
 ```json
@@ -546,7 +535,9 @@ These routes are provided **for demonstration purposes only**, allowing direct a
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
+| GET | `/demo/users` | List all users |
 | GET | `/demo/users/{userId}` | Get user by ID |
+| GET | `/demo/wallets` | List all wallets |
 | GET | `/demo/wallets/{walletId}` | Get wallet by ID |
 | GET | `/demo/wallets/{walletId}/transactions` | Get wallet transactions |
 

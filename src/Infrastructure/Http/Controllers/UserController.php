@@ -10,6 +10,7 @@ use App\Application\UseCases\User\GetCurrentUserUseCase;
 use App\Application\UseCases\User\GetUserByIdUseCase;
 use App\Application\UseCases\User\LoginUserUseCase;
 use App\Infrastructure\Http\Requests\RegisterUserRequest;
+use App\Infrastructure\Persistence\Eloquent\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -54,5 +55,20 @@ class UserController extends Controller
     public function showById(string $userId): JsonResponse
     {
         return response()->json(['data' => $this->getUserByIdUseCase->execute($userId)->toArray()]);
+    }
+
+    public function index(): JsonResponse
+    {
+        $users = User::all();
+
+        return response()->json([
+            'data' => $users->map(fn ($u) => [
+                'id' => $u->id,
+                'name' => $u->name,
+                'email' => $u->email,
+                'wallet_id' => $u->wallet_id,
+                'created_at' => $u->created_at->toIso8601String(),
+            ])->all(),
+        ]);
     }
 }

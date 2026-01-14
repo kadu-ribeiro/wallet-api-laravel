@@ -13,6 +13,7 @@ use App\Application\UseCases\Wallet\WithdrawMoneyUseCase;
 use App\Domain\User\Services\AuthContextInterface;
 use App\Infrastructure\Http\Requests\DepositRequest;
 use App\Infrastructure\Http\Requests\WithdrawRequest;
+use App\Infrastructure\Persistence\Eloquent\Wallet;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -90,5 +91,21 @@ class WalletController extends Controller
         return response()->json(
             $transactions->map(fn ($tx) => $tx->toArray())->all()
         );
+    }
+
+    public function index(): JsonResponse
+    {
+        $wallets = Wallet::all();
+
+        return response()->json([
+            'data' => $wallets->map(fn ($w) => [
+                'id' => $w->id,
+                'user_id' => $w->user_id,
+                'balance' => number_format($w->balance_cents / 100, 2, '.', ''),
+                'balance_cents' => $w->balance_cents,
+                'currency' => $w->currency,
+                'created_at' => $w->created_at->toIso8601String(),
+            ])->all(),
+        ]);
     }
 }

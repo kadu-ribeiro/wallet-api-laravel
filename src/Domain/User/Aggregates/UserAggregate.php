@@ -8,7 +8,6 @@ use App\Domain\User\Events\UserCreated;
 use App\Domain\User\Exceptions\UserNotExistsException;
 use Spatie\EventSourcing\AggregateRoots\AggregateRoot;
 
-
 final class UserAggregate extends AggregateRoot
 {
     private ?string $email = null;
