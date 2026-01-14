@@ -597,12 +597,10 @@ All errors follow a standardized JSON format:
 - **Event Sourcing:** spatie/laravel-event-sourcing
 - **Server:** Laravel Octane (Swoole)
 - **Authentication:** Laravel Sanctum
-- **Database:** SQLite (MySQL/PostgreSQL compatible)
+- **Database:** SQLite
 - **Queue:** Redis
 - **Testing:** Pest PHP
 - **Money Handling:** brick/money
-- **UUID:** ramsey/uuid
-- **Container:** Docker
 
 ## Development
 
