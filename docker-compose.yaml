@@ -44,18 +44,15 @@ services:
               set -e
               echo "Starting container setup..."
 
-              # 1. Create .env if not exists
               if [ ! -f ".env" ]; then
                   echo ".env not found. Creating from .env.example..."
                   cp .env.example .env
               fi
 
-              # 2. Install PHP dependencies (Composer) if needed
               if [ ! -d "vendor" ]; then
                   echo "Installing Composer dependencies..."
                   composer install --ignore-platform-reqs
 
-                  # Generate key only on first install
                   if grep -q "APP_KEY=" .env && [ -z "$(grep APP_KEY= .env | cut -d '=' -f2)" ]; then
                        php artisan key:generate
                   fi
@@ -63,18 +60,16 @@ services:
 
               composer dump-autoload
 
-              # 3. Install Node dependencies (NPM) if needed
               if [ ! -d "node_modules" ]; then
-                   echo "Installing NPM dependencies..."
                    npm install --verbose
               fi
 
-              # 4. Run migrations
+              if [ ! -f "database/database.sqlite" ]; then
+                   echo "Creating SQLite database..."
+                   touch database/database.sqlite
+              fi
+
               php artisan migrate --force
-
-              echo "Setup complete. Starting server..."
-
-              # Start Octane server
               php -d variables_order=EGPCS artisan octane:start --server=swoole --watch --host=0.0.0.0 --port=${APP_PORT:-80}
     laravel-worker:
         image: sail-8.4/app

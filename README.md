@@ -101,15 +101,18 @@ This separation allows us to optimize each side independently.
 git clone <repository-url>
 cd wallet-api-laravel
 
-# Start Docker containers
+# Start Docker containers (migrations run automatically)
 docker-compose up -d
-
-# Run migrations
-docker-compose exec laravel php artisan migrate
 
 # API: http://localhost:8080
 # Email viewer (Mailpit): http://localhost:8025
 ```
+
+The container automatically handles:
+- Installing Composer and NPM dependencies
+- Creating the SQLite database
+- Running migrations
+- Starting the Octane server
 
 ## Testing the API
 
