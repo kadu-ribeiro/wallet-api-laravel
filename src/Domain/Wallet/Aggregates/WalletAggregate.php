@@ -15,6 +15,7 @@ use App\Domain\Wallet\Exceptions\InvalidAmountException;
 use App\Domain\Wallet\Exceptions\InvalidIdempotencyKeyException;
 use App\Domain\Wallet\Exceptions\WalletNotCreatedException;
 use Carbon\Carbon;
+use Illuminate\Support\LazyCollection;
 use Spatie\EventSourcing\AggregateRoots\AggregateRoot;
 use Spatie\EventSourcing\StoredEvents\ShouldBeStored;
 
@@ -44,6 +45,11 @@ final class WalletAggregate extends AggregateRoot
         }
 
         return $this;
+    }
+
+    public function persistWithoutApplyingToEventHandlers(): LazyCollection
+    {
+        return parent::persistWithoutApplyingToEventHandlers();
     }
 
     public function createWallet(string $userId, string $currency = 'BRL'): self
