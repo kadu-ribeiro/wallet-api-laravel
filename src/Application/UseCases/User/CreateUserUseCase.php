@@ -48,8 +48,7 @@ final readonly class CreateUserUseCase implements CreateUserUseCaseInterface
                     email: $email->value,
                     passwordHash: Hash::make($password->value)
                 )
-                ->persist()
-            ;
+                ->persist();
 
             $walletIdString = $this->createWalletUseCase->execute(
                 new CreateWalletDTO(userId: $userId->value)

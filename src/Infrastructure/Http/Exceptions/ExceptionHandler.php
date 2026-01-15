@@ -20,12 +20,12 @@ use App\Domain\Wallet\Exceptions\TransferAlreadyProcessedException;
 use App\Domain\Wallet\Exceptions\WalletNotCreatedException;
 use App\Domain\Wallet\Exceptions\WalletNotFoundException;
 use Illuminate\Auth\AuthenticationException;
-use Spatie\EventSourcing\AggregateRoots\Exceptions\CouldNotPersistAggregate;
 use Illuminate\Contracts\Debug\ExceptionHandler as LaravelExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use Spatie\EventSourcing\AggregateRoots\Exceptions\CouldNotPersistAggregate;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 

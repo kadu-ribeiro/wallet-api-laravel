@@ -96,7 +96,7 @@ final readonly class TransferMoneyUseCase implements TransferMoneyUseCaseInterfa
         } catch (UniqueConstraintViolationException) {
             throw TransferAlreadyProcessedException::withIdempotencyKey($dto->idempotencyKey);
         } catch (QueryException $e) {
-            if (23000 === (int) $e->getCode()) {
+            if ((int) $e->getCode() === 23000) {
                 throw TransferAlreadyProcessedException::withIdempotencyKey($dto->idempotencyKey);
             }
 

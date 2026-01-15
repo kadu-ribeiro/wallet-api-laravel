@@ -29,22 +29,19 @@ final class WalletProjector extends Projector
     public function onMoneyDeposited(MoneyDeposited $event): void
     {
         Wallet::where('id', $event->walletId)
-            ->update(['balance_cents' => $event->balanceAfterCents])
-        ;
+            ->update(['balance_cents' => $event->balanceAfterCents]);
     }
 
     public function onMoneyWithdrawn(MoneyWithdrawn $event): void
     {
         Wallet::where('id', $event->walletId)
-            ->update(['balance_cents' => $event->balanceAfterCents])
-        ;
+            ->update(['balance_cents' => $event->balanceAfterCents]);
     }
 
     public function onMoneyTransferredOut(MoneyTransferredOut $event): void
     {
         Wallet::where('id', $event->walletId)
-            ->update(['balance_cents' => $event->balanceAfterCents])
-        ;
+            ->update(['balance_cents' => $event->balanceAfterCents]);
     }
 
     public function onMoneyTransferredIn(MoneyTransferredIn $event): void

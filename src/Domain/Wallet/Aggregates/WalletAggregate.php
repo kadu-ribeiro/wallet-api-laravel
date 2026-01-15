@@ -40,7 +40,7 @@ final class WalletAggregate extends AggregateRoot
         parent::recordThat($domainEvent);
 
         $frequency = config('wallet.snapshot_frequency', 100);
-        if ($this->aggregateVersion > 0 && 0 === $this->aggregateVersion % $frequency) {
+        if ($this->aggregateVersion > 0 && $this->aggregateVersion % $frequency === 0) {
             $this->snapshot();
         }
 
@@ -73,7 +73,7 @@ final class WalletAggregate extends AggregateRoot
 
         $newBalance = $this->balanceCents + $amountCents;
 
-        $idempotencyKey = $metadata['idempotency_key'] ?? throw new InvalidIdempotencyKeyException();
+        $idempotencyKey = $metadata['idempotency_key'] ?? throw new InvalidIdempotencyKeyException;
         unset($metadata['idempotency_key']);
 
         $this->recordThat(new MoneyDeposited(
@@ -100,7 +100,7 @@ final class WalletAggregate extends AggregateRoot
 
         $newBalance = $this->balanceCents - $amountCents;
 
-        $idempotencyKey = $metadata['idempotency_key'] ?? throw new InvalidIdempotencyKeyException();
+        $idempotencyKey = $metadata['idempotency_key'] ?? throw new InvalidIdempotencyKeyException;
         unset($metadata['idempotency_key']);
 
         $this->recordThat(new MoneyWithdrawn(
@@ -290,7 +290,7 @@ final class WalletAggregate extends AggregateRoot
 
     private function isTransactionToday(Carbon $todayUTC): bool
     {
-        if (null === $this->lastTransactionDate) {
+        if ($this->lastTransactionDate === null) {
             return false;
         }
 

@@ -18,8 +18,7 @@ test('can create wallet for user', function (): void {
 
     expect($wallet)->not()->toBeNull()
         ->and($wallet->user_id)->toBe($user->id)
-        ->and($wallet->balance_cents)->toBe(0)
-    ;
+        ->and($wallet->balance_cents)->toBe(0);
 });
 
 test('can deposit money and update balance', function (): void {
@@ -95,6 +94,5 @@ test('multiple users can have wallets', function (): void {
     ]);
 
     expect($user1->wallet->balance_cents)->toBe(1000)
-        ->and($user2->wallet->balance_cents)->toBe(2000)
-    ;
+        ->and($user2->wallet->balance_cents)->toBe(2000);
 });

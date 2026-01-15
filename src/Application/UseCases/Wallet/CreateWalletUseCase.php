@@ -17,8 +17,7 @@ final readonly class CreateWalletUseCase implements CreateWalletUseCaseInterface
 
         WalletAggregate::retrieve($walletId)
             ->createWallet($dto->userId)
-            ->persist()
-        ;
+            ->persist();
 
         return $walletId;
     }

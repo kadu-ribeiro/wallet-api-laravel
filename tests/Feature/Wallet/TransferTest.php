@@ -37,8 +37,7 @@ test('transfer endpoint requires authentication', function (): void {
 test('wallet relationship works correctly', function (): void {
     expect($this->sender->wallet)->not()->toBeNull()
         ->and($this->sender->wallet->balance_cents)->toBe(50000)
-        ->and($this->recipient->wallet->balance_cents)->toBe(10000)
-    ;
+        ->and($this->recipient->wallet->balance_cents)->toBe(10000);
 });
 
 test('sender wallet has correct balance', function (): void {

@@ -29,8 +29,7 @@ final readonly class WithdrawMoneyUseCase implements WithdrawMoneyUseCaseInterfa
         try {
             $aggregate = WalletAggregate::retrieve($dto->walletId)
                 ->withdraw($amount->toCents(), $metadata)
-                ->persist()
-            ;
+                ->persist();
 
             $balance = Money::fromCents($aggregate->getBalance(), $aggregate->getCurrency());
 
@@ -42,7 +41,7 @@ final readonly class WithdrawMoneyUseCase implements WithdrawMoneyUseCaseInterfa
                 currency: $aggregate->getCurrency()
             );
         } catch (QueryException $e) {
-            if (23000 === intval($e->getCode())) {
+            if (intval($e->getCode()) === 23000) {
                 throw TransferAlreadyProcessedException::withIdempotencyKey($dto->idempotencyKey);
             }
 

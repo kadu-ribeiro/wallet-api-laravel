@@ -18,8 +18,7 @@ $builder
     ->withKernels()
     ->withEvents()
     ->withCommands()
-    ->withProviders()
-;
+    ->withProviders();
 
 return $builder
     ->withRouting(

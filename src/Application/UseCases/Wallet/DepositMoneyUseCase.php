@@ -23,8 +23,7 @@ final readonly class DepositMoneyUseCase implements DepositMoneyUseCaseInterface
         try {
             $aggregate = WalletAggregate::retrieve($dto->walletId)
                 ->deposit($amount->toCents(), $metadata)
-                ->persist()
-            ;
+                ->persist();
 
             $balance = Money::fromCents($aggregate->getBalance(), $aggregate->getCurrency());
 
@@ -38,7 +37,7 @@ final readonly class DepositMoneyUseCase implements DepositMoneyUseCaseInterface
         } catch (UniqueConstraintViolationException $e) {
             throw TransferAlreadyProcessedException::withIdempotencyKey($dto->idempotencyKey);
         } catch (QueryException $e) {
-            if (23000 === intval($e->getCode())) {
+            if (intval($e->getCode()) === 23000) {
                 throw TransferAlreadyProcessedException::withIdempotencyKey($dto->idempotencyKey);
             }
 

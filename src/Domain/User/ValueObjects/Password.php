@@ -16,7 +16,7 @@ final readonly class Password
 
     public static function from(string $password): self
     {
-        if ('' === $password) {
+        if ($password === '') {
             throw InvalidPasswordException::empty();
         }
 

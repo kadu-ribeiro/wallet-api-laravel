@@ -78,16 +78,13 @@ class Application extends ServiceProvider
                         Route::get('transactions', [WalletController::class, 'transactions']);
 
                         Route::post('deposit', [WalletController::class, 'deposit'])
-                            ->middleware(ValidateIdempotencyKey::class)
-                        ;
+                            ->middleware(ValidateIdempotencyKey::class);
                         Route::post('withdraw', [WalletController::class, 'withdraw'])
-                            ->middleware(ValidateIdempotencyKey::class)
-                        ;
+                            ->middleware(ValidateIdempotencyKey::class);
                     });
 
                     Route::post('transfers', [TransferController::class, 'store'])
-                        ->middleware(ValidateIdempotencyKey::class)
-                    ;
+                        ->middleware(ValidateIdempotencyKey::class);
                 });
 
                 Route::prefix('demo')->group(function (): void {
@@ -97,8 +94,7 @@ class Application extends ServiceProvider
                     Route::get('wallets/{walletId}', [WalletController::class, 'showById']);
                     Route::get('wallets/{walletId}/transactions', [WalletController::class, 'transactionsById']);
                 });
-            })
-        ;
+            });
     }
 
     private function registerEventHandlers(): void
@@ -113,8 +109,7 @@ class Application extends ServiceProvider
             ->addReactors([
                 WelcomeEmailReactor::class,
                 TransferNotificationReactor::class,
-            ])
-        ;
+            ]);
     }
 
     private function registerExceptionHandlers(): void

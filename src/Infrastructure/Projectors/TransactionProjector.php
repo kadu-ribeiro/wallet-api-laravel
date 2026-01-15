@@ -57,8 +57,7 @@ final class TransactionProjector extends Projector
     {
         $relatedTx = Transaction::where('idempotency_key', $event->transferId)
             ->where('type', 'transfer_out')
-            ->first()
-        ;
+            ->first();
 
         $transaction = Transaction::create([
             'wallet_id' => $event->walletId,

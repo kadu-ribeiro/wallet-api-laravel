@@ -14,8 +14,7 @@ test('user model can be created with factory', function (): void {
     ]);
 
     expect($user)->not()->toBeNull()
-        ->and($user->email)->toBe('test@example.com')
-    ;
+        ->and($user->email)->toBe('test@example.com');
 
     $this->assertDatabaseHas('users', [
         'email' => 'test@example.com',
@@ -33,8 +32,7 @@ test('user can have wallet relation', function (): void {
     ]);
 
     expect($user->wallet)->not()->toBeNull()
-        ->and($user->wallet->id)->toBe($wallet->id)
-    ;
+        ->and($user->wallet->id)->toBe($wallet->id);
 });
 
 test('email validation rejects invalid format', function (): void {

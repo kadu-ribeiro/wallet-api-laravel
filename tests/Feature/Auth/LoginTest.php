@@ -32,6 +32,5 @@ test('user cannot login with invalid password', function (): void {
     ]);
 
     $response->assertStatus(401)
-        ->assertJson(['error' => 'Invalid email or password'])
-    ;
+        ->assertJson(['error' => 'Invalid email or password']);
 });

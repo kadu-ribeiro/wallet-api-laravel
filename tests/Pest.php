@@ -7,12 +7,10 @@ use Tests\TestCase;
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
-    ->in('Feature')
-;
+    ->in('Feature');
 
 pest()->extend(TestCase::class)
-    ->in('Integration')
-;
+    ->in('Integration');
 
 pest()->extend(TestCase::class)
     ->in('E2E');

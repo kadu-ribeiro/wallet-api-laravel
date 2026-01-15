@@ -9,16 +9,14 @@ test('money fromCents creates correct value', function (): void {
 
     expect($money->toCents())->toBe(10050)
         ->and($money->toDecimal())->toBe('100.50')
-        ->and($money->getCurrency())->toBe('BRL')
-    ;
+        ->and($money->getCurrency())->toBe('BRL');
 });
 
 test('money fromDecimal creates correct value', function (): void {
     $money = Money::fromDecimal('250.76', 'BRL');
 
     expect($money->toCents())->toBe(25076)
-        ->and($money->getCurrency())->toBe('BRL')
-    ;
+        ->and($money->getCurrency())->toBe('BRL');
 });
 
 test('money throws on negative amount', function (): void {
@@ -31,8 +29,7 @@ test('money arithmetic add works', function (): void {
     $result = $money1->add($money2);
 
     expect($result->toDecimal())->toBe('150.00')
-        ->and($result->toCents())->toBe(15000)
-    ;
+        ->and($result->toCents())->toBe(15000);
 });
 
 test('money arithmetic subtract works', function (): void {
@@ -41,8 +38,7 @@ test('money arithmetic subtract works', function (): void {
     $result = $money1->subtract($money2);
 
     expect($result->toDecimal())->toBe('70.00')
-        ->and($result->toCents())->toBe(7000)
-    ;
+        ->and($result->toCents())->toBe(7000);
 });
 
 test('money zero works', function (): void {
@@ -50,8 +46,7 @@ test('money zero works', function (): void {
 
     expect($money->toCents())->toBe(0)
         ->and($money->toDecimal())->toBe('0.00')
-        ->and($money->isZero())->toBeTrue()
-    ;
+        ->and($money->isZero())->toBeTrue();
 });
 
 test('money isPositive works', function (): void {

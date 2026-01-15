@@ -27,8 +27,7 @@ test('wallet model balance works correctly', function (): void {
 
 test('wallet belongs to user', function (): void {
     expect($this->user->wallet)->not()->toBeNull()
-        ->and($this->user->wallet->id)->toBe($this->wallet->id)
-    ;
+        ->and($this->user->wallet->id)->toBe($this->wallet->id);
 });
 
 test('wallet has correct currency', function (): void {
@@ -47,8 +46,7 @@ test('can create transaction record', function (): void {
 
     expect($transaction)->not()->toBeNull()
         ->and($transaction->amount_cents)->toBe(5000)
-        ->and($transaction->type)->toBe('deposit')
-    ;
+        ->and($transaction->type)->toBe('deposit');
 });
 
 test('wallet can have multiple transactions', function (): void {
@@ -77,6 +75,5 @@ test('user can access wallet via relationship', function (): void {
     $foundWallet = $this->user->wallet;
 
     expect($foundWallet->id)->toBe($this->wallet->id)
-        ->and($foundWallet->balance_cents)->toBe(10000)
-    ;
+        ->and($foundWallet->balance_cents)->toBe(10000);
 });

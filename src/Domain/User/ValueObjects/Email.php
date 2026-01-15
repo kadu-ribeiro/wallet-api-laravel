@@ -21,7 +21,7 @@ final readonly class Email
     {
         $email = strtolower(trim($email));
 
-        if ('' === $email) {
+        if ($email === '') {
             throw InvalidEmailException::empty();
         }
 

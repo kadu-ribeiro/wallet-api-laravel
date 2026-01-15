@@ -42,6 +42,5 @@ test('InsufficientBalanceException shows amounts', function (): void {
     $exception = InsufficientBalanceException::forWithdrawal(10000, 15000);
     expect($exception->getMessage())
         ->toContain('100.00')
-        ->toContain('150.00')
-    ;
+        ->toContain('150.00');
 });

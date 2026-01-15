@@ -25,10 +25,10 @@ abstract readonly class UuidIdentifier
 
     public static function isValid(string $value): bool
     {
-        return 1 === preg_match(
+        return preg_match(
             '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i',
             $value
-        );
+        ) === 1;
     }
 
     public function equals(self $other): bool

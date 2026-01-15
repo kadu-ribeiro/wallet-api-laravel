@@ -25,7 +25,7 @@ final readonly class UserName
     {
         $name = trim($name);
 
-        if ('' === $name) {
+        if ($name === '') {
             throw InvalidUserNameException::empty();
         }
 
