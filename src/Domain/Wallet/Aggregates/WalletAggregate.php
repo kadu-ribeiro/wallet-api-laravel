@@ -82,7 +82,7 @@ final class WalletAggregate extends AggregateRoot
             balanceAfterCents: $newBalance,
             idempotencyKey: $idempotencyKey,
             metadata: $metadata
-        ))->snapshot();
+        ));
 
         return $this;
     }
