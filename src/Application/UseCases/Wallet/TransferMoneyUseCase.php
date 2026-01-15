@@ -15,10 +15,12 @@ use App\Domain\Wallet\Exceptions\RecipientNotFoundException;
 use App\Domain\Wallet\Exceptions\SelfTransferNotAllowedException;
 use App\Domain\Wallet\Exceptions\TransferAlreadyProcessedException;
 use App\Domain\Wallet\Exceptions\WalletNotFoundException;
+use App\Domain\Wallet\Repositories\TransactionRepositoryInterface;
 use App\Domain\Wallet\Repositories\WalletRepositoryInterface;
 use App\Domain\Wallet\ValueObjects\Money;
 use App\Domain\Wallet\ValueObjects\WalletId;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 use Spatie\EventSourcing\Projectionist;
 
@@ -27,6 +29,7 @@ final readonly class TransferMoneyUseCase implements TransferMoneyUseCaseInterfa
     public function __construct(
         private UserRepositoryInterface $userRepository,
         private WalletRepositoryInterface $walletRepository,
+        private TransactionRepositoryInterface $transactionRepository,
         private Projectionist $projectionist
     ) {}
 
@@ -49,6 +52,10 @@ final readonly class TransferMoneyUseCase implements TransferMoneyUseCaseInterfa
             throw SelfTransferNotAllowedException::create();
         }
 
+        if ($this->transactionRepository->idempotencyKeyExists($dto->idempotencyKey)) {
+            throw TransferAlreadyProcessedException::withIdempotencyKey($dto->idempotencyKey);
+        }
+
         $senderAggregate = WalletAggregate::retrieve($dto->walletId)
             ->transferOut(
                 amountCents: $amount->toCents(),
@@ -66,12 +73,28 @@ final readonly class TransferMoneyUseCase implements TransferMoneyUseCaseInterfa
             );
 
         try {
-            $storedEvents = DB::transaction(function () use ($senderAggregate, $recipientAggregate) {
+            return DB::transaction(function () use ($dto, $senderAggregate, $recipientAggregate, $recipientWallet, $amount) {
                 $senderEvents = $senderAggregate->persistWithoutApplyingToEventHandlers()->all();
                 $recipientEvents = $recipientAggregate->persistWithoutApplyingToEventHandlers()->all();
 
-                return [...$senderEvents, ...$recipientEvents];
+                $this->projectionist->handleStoredEvents(collect([...$senderEvents, ...$recipientEvents]));
+
+                return new TransferResultDTO(
+                    message: 'Transfer successful',
+                    transferId: $dto->idempotencyKey,
+                    walletId: $dto->walletId,
+                    balanceCents: $senderAggregate->getBalance(),
+                    balance: Money::fromCents($senderAggregate->getBalance(), $senderAggregate->getCurrency())->toDecimal(),
+                    recipientWalletId: $recipientWallet->id->value,
+                    recipientBalanceCents: $recipientAggregate->getBalance(),
+                    recipientBalance: Money::fromCents($recipientAggregate->getBalance(), $recipientAggregate->getCurrency())->toDecimal(),
+                    amountCents: $amount->toCents(),
+                    amount: $amount->toDecimal(),
+                    currency: $senderAggregate->getCurrency()
+                );
             });
+        } catch (UniqueConstraintViolationException) {
+            throw TransferAlreadyProcessedException::withIdempotencyKey($dto->idempotencyKey);
         } catch (QueryException $e) {
             if (23000 === (int) $e->getCode()) {
                 throw TransferAlreadyProcessedException::withIdempotencyKey($dto->idempotencyKey);
@@ -79,24 +102,5 @@ final readonly class TransferMoneyUseCase implements TransferMoneyUseCaseInterfa
 
             throw $e;
         }
-
-        $this->projectionist->handleStoredEvents(collect($storedEvents));
-
-        $senderBalance = Money::fromCents($senderAggregate->getBalance(), $senderAggregate->getCurrency());
-        $recipientBalance = Money::fromCents($recipientAggregate->getBalance(), $recipientAggregate->getCurrency());
-
-        return new TransferResultDTO(
-            message: 'Transfer successful',
-            transferId: $dto->idempotencyKey,
-            walletId: $dto->walletId,
-            balanceCents: $senderAggregate->getBalance(),
-            balance: $senderBalance->toDecimal(),
-            recipientWalletId: $recipientWallet->id->value,
-            recipientBalanceCents: $recipientAggregate->getBalance(),
-            recipientBalance: $recipientBalance->toDecimal(),
-            amountCents: $amount->toCents(),
-            amount: $amount->toDecimal(),
-            currency: $senderAggregate->getCurrency()
-        );
     }
 }
