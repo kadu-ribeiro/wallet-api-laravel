@@ -414,18 +414,14 @@ curl -X GET http://localhost:8080/api/wallet/transactions \
 
 **Running Tests:**
 ```bash
-# All tests
 docker-compose exec laravel php artisan test
-
-# E2E tests
-docker-compose exec laravel sh tests/e2e_tests.sh
 ```
 
 **Test Structure:**
 - `tests/Unit/` - Domain logic, Value Objects, Enums
 - `tests/Integration/` - Aggregate behavior with event sourcing
 - `tests/Feature/` - API endpoints and authorization
-- `tests/E2E/` - Complete user flows via shell script
+- `tests/E2E/` - Complete user flows
 
 ### Docker Setup
 
@@ -653,9 +649,6 @@ docker-compose exec laravel php artisan test
 # Specific test suite
 docker-compose exec laravel php artisan test --testsuite=Unit
 docker-compose exec laravel php artisan test --testsuite=Feature
-
-# E2E tests
-docker-compose exec laravel sh tests/e2e_tests.sh
 ```
 
 ## Configuration
