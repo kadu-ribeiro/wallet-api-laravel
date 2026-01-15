@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Domain\Wallet\ValueObjects;
 
+use App\Domain\Wallet\Exceptions\InvalidAmountException;
 use Brick\Math\RoundingMode;
 use Brick\Money\Context\CashContext;
 use Brick\Money\Money as BrickMoney;
-use InvalidArgumentException;
 
 final readonly class Money
 {
@@ -18,7 +18,7 @@ final readonly class Money
     public static function fromCents(int $amountCents, string $currencyCode = 'BRL'): self
     {
         if ($amountCents < 0) {
-            throw new InvalidArgumentException('Amount cannot be negative');
+            throw InvalidAmountException::cannotBeNegative();
         }
 
         return new self(
@@ -29,7 +29,7 @@ final readonly class Money
     public static function fromDecimal(string $amount, string $currencyCode = 'BRL'): self
     {
         if (str_starts_with($amount, '-')) {
-            throw new InvalidArgumentException('Amount cannot be negative');
+            throw InvalidAmountException::cannotBeNegative();
         }
 
         return new self(

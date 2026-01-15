@@ -12,4 +12,9 @@ final class InvalidAmountException extends Exception
     {
         return new self('Amount must be positive');
     }
+
+    public static function cannotBeNegative(): self
+    {
+        return new self('Amount cannot be negative');
+    }
 }
