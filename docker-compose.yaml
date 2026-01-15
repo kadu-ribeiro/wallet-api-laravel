@@ -22,6 +22,7 @@ services:
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
+            WALLET_WEBHOOK_TRANSFER_URL: 'http://webhook-tester:8080/wallet-transfers'
         volumes:
             - '.:/var/www/html'
         networks:
@@ -63,6 +64,7 @@ services:
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
+            WALLET_WEBHOOK_TRANSFER_URL: 'http://webhook-tester:8080/wallet-transfers'
         volumes:
             - '.:/var/www/html'
         networks:
@@ -79,6 +81,12 @@ services:
             - artisan
             - 'queue:work'
             - '--queue=default,event-projectors,webhooks'
+    webhook-tester:
+        image: tarampampam/webhook-tester:1
+        ports:
+            - '8080:8080'
+        networks:
+            - sail
     mailpit:
         image: 'axllent/mailpit:latest'
         ports:
