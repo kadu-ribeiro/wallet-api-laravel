@@ -23,6 +23,7 @@ services:
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
+            WALLET_WEBHOOK_TRANSFER_URL: 'http://wirehook:9000'
         volumes:
             - '.:/var/www/html'
         networks:
@@ -83,6 +84,7 @@ services:
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
+            WALLET_WEBHOOK_TRANSFER_URL: 'http://wirehook:9000'
         volumes:
             - '.:/var/www/html'
         networks:
@@ -98,7 +100,7 @@ services:
             - php
             - artisan
             - 'queue:work'
-            - '--queue=default,event-projectors'
+            - '--queue=default,event-projectors,webhooks'
     wirehook:
         image: runabol/wirehook:latest
         ports:

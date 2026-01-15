@@ -43,7 +43,8 @@ final class WebhookProjector extends Projector implements ShouldQueue
                     'sender_email' => $event->senderEmail,
                     'transfer_id' => $event->transferId,
                     'timestamp' => now()->toIso8601String(),
-                ]);
+                ])
+            ;
 
             if ($response->failed()) {
                 Log::warning('Webhook failed', [
