@@ -20,6 +20,7 @@ use App\Domain\Wallet\Exceptions\TransferAlreadyProcessedException;
 use App\Domain\Wallet\Exceptions\WalletNotCreatedException;
 use App\Domain\Wallet\Exceptions\WalletNotFoundException;
 use Illuminate\Auth\AuthenticationException;
+use Spatie\EventSourcing\AggregateRoots\Exceptions\CouldNotPersistAggregate;
 use Illuminate\Contracts\Debug\ExceptionHandler as LaravelExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -127,6 +128,11 @@ final class ExceptionHandler
 
         $handler->renderable(fn (TransferAlreadyProcessedException $e, Request $r): JsonResponse => response()->json(
             ['error' => $e->getMessage()],
+            Response::HTTP_CONFLICT
+        ));
+
+        $handler->renderable(fn (CouldNotPersistAggregate $e, Request $r): JsonResponse => response()->json(
+            ['error' => 'Resource conflict, please retry'],
             Response::HTTP_CONFLICT
         ));
     }
