@@ -22,7 +22,7 @@ final readonly class Money
         }
 
         return new self(
-            BrickMoney::ofMinor($amountCents, $currencyCode, new CashContext(2), RoundingMode::HALF_UP)
+            BrickMoney::ofMinor($amountCents, $currencyCode, new CashContext(1), RoundingMode::HALF_UP)
         );
     }
 
@@ -33,7 +33,7 @@ final readonly class Money
         }
 
         return new self(
-            BrickMoney::of($amount, $currencyCode, new CashContext(2), RoundingMode::HALF_UP)
+            BrickMoney::of($amount, $currencyCode, new CashContext(1), RoundingMode::HALF_UP)
         );
     }
 

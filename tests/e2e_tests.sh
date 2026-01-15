@@ -353,6 +353,125 @@ else
     echo "  ✗ Metadata not found"
 fi
 
+# ===================================================================
+# TEST 24-27: Decimal Amount Calculations
+# ===================================================================
+echo "\n==================================================================="
+echo ">>> TEST 24: Decimal Amount Deposit (R\$50.78)"
+echo "==================================================================="
+UUID_DEC1=$(cat /proc/sys/kernel/random/uuid)
+BALANCE_BEFORE=$(run_curl -X GET "$API_URL/wallet/balance" -H "Authorization: Bearer $ALICE_TOKEN" | jq -r '.data.balance_cents')
+RESPONSE=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/wallet/deposit" -H "Authorization: Bearer $ALICE_TOKEN" -H "Idempotency-Key: $UUID_DEC1" -d '{"amount":"50.78"}')
+HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+BODY=$(echo "$RESPONSE" | sed '$d')
+assert_http_code "200" "$HTTP_CODE" "Decimal deposit"
+BALANCE_AFTER=$(echo "$BODY" | jq -r '.wallet.balance_cents')
+EXPECTED=$((BALANCE_BEFORE + 5078))
+TESTS_TOTAL=$((TESTS_TOTAL + 1))
+if [ "$BALANCE_AFTER" = "$EXPECTED" ]; then
+    echo "  ✓ Balance correct: $BALANCE_BEFORE + 5078 = $BALANCE_AFTER"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+    echo "  ✗ Balance mismatch: expected $EXPECTED, got $BALANCE_AFTER"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+fi
+
+echo "\n==================================================================="
+echo ">>> TEST 25: Decimal Amount Withdraw (R\$10.27)"
+echo "==================================================================="
+UUID_DEC2=$(cat /proc/sys/kernel/random/uuid)
+BALANCE_BEFORE=$(run_curl -X GET "$API_URL/wallet/balance" -H "Authorization: Bearer $ALICE_TOKEN" | jq -r '.data.balance_cents')
+RESPONSE=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/wallet/withdraw" -H "Authorization: Bearer $ALICE_TOKEN" -H "Idempotency-Key: $UUID_DEC2" -d '{"amount":"10.27"}')
+HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+BODY=$(echo "$RESPONSE" | sed '$d')
+assert_http_code "200" "$HTTP_CODE" "Decimal withdraw"
+BALANCE_AFTER=$(echo "$BODY" | jq -r '.wallet.balance_cents')
+EXPECTED=$((BALANCE_BEFORE - 1027))
+TESTS_TOTAL=$((TESTS_TOTAL + 1))
+if [ "$BALANCE_AFTER" = "$EXPECTED" ]; then
+    echo "  ✓ Balance correct: $BALANCE_BEFORE - 1027 = $BALANCE_AFTER"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+    echo "  ✗ Balance mismatch: expected $EXPECTED, got $BALANCE_AFTER"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+fi
+
+echo "\n==================================================================="
+echo ">>> TEST 26: Decimal Amount Transfer (R\$93.99)"
+echo "==================================================================="
+UUID_DEC3=$(cat /proc/sys/kernel/random/uuid)
+ALICE_BEFORE=$(run_curl -X GET "$API_URL/wallet/balance" -H "Authorization: Bearer $ALICE_TOKEN" | jq -r '.data.balance_cents')
+BOB_LOGIN=$(run_curl -X POST "$API_URL/auth/login" -d '{"email":"bob@test.com","password":"password123"}')
+BOB_TOKEN=$(echo "$BOB_LOGIN" | jq -r '.token')
+BOB_BEFORE=$(run_curl -X GET "$API_URL/wallet/balance" -H "Authorization: Bearer $BOB_TOKEN" | jq -r '.data.balance_cents')
+RESPONSE=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/transfers" -H "Authorization: Bearer $ALICE_TOKEN" -H "Idempotency-Key: $UUID_DEC3" -d '{"recipient_email":"bob@test.com","amount":"93.99"}')
+HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+BODY=$(echo "$RESPONSE" | sed '$d')
+assert_http_code "200" "$HTTP_CODE" "Decimal transfer"
+ALICE_AFTER=$(echo "$BODY" | jq -r '.sender.balance_cents')
+BOB_AFTER=$(echo "$BODY" | jq -r '.recipient.balance_cents')
+ALICE_EXPECTED=$((ALICE_BEFORE - 9399))
+BOB_EXPECTED=$((BOB_BEFORE + 9399))
+echo "  Info: Alice before=$ALICE_BEFORE after=$ALICE_AFTER expected=$ALICE_EXPECTED"
+echo "  Info: Bob before=$BOB_BEFORE after=$BOB_AFTER expected=$BOB_EXPECTED"
+TESTS_TOTAL=$((TESTS_TOTAL + 1))
+if [ "$ALICE_AFTER" = "$ALICE_EXPECTED" ]; then
+    echo "  ✓ Alice balance correct: $ALICE_BEFORE - 9399 = $ALICE_AFTER"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+    echo "  ✗ Alice balance mismatch: expected $ALICE_EXPECTED, got $ALICE_AFTER"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+fi
+TESTS_TOTAL=$((TESTS_TOTAL + 1))
+if [ "$BOB_AFTER" = "$BOB_EXPECTED" ]; then
+    echo "  ✓ Bob balance correct: $BOB_BEFORE + 9399 = $BOB_AFTER"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+    echo "  ✗ Bob balance mismatch: expected $BOB_EXPECTED, got $BOB_AFTER"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+fi
+
+echo "\n==================================================================="
+echo ">>> TEST 27: Edge Case - Smallest Decimal (R\$0.01)"
+echo "==================================================================="
+UUID_DEC4=$(cat /proc/sys/kernel/random/uuid)
+BALANCE_BEFORE=$(run_curl -X GET "$API_URL/wallet/balance" -H "Authorization: Bearer $ALICE_TOKEN" | jq -r '.data.balance_cents')
+RESPONSE=$(run_curl -w "\n%{http_code}" -X POST "$API_URL/wallet/deposit" -H "Authorization: Bearer $ALICE_TOKEN" -H "Idempotency-Key: $UUID_DEC4" -d '{"amount":"0.01"}')
+HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+BODY=$(echo "$RESPONSE" | sed '$d')
+assert_http_code "200" "$HTTP_CODE" "Minimum deposit"
+BALANCE_AFTER=$(echo "$BODY" | jq -r '.wallet.balance_cents')
+EXPECTED=$((BALANCE_BEFORE + 1))
+TESTS_TOTAL=$((TESTS_TOTAL + 1))
+if [ "$BALANCE_AFTER" = "$EXPECTED" ]; then
+    echo "  ✓ Balance correct: $BALANCE_BEFORE + 1 = $BALANCE_AFTER"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+    echo "  ✗ Balance mismatch: expected $EXPECTED, got $BALANCE_AFTER"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+fi
+
+echo "\n==================================================================="
+echo ">>> TEST 28: Multiple Decimal Operations Chain"
+echo "==================================================================="
+UUID_CHN1=$(cat /proc/sys/kernel/random/uuid)
+UUID_CHN2=$(cat /proc/sys/kernel/random/uuid)
+UUID_CHN3=$(cat /proc/sys/kernel/random/uuid)
+BALANCE_START=$(run_curl -X GET "$API_URL/wallet/balance" -H "Authorization: Bearer $ALICE_TOKEN" | jq -r '.data.balance_cents')
+run_curl -X POST "$API_URL/wallet/deposit" -H "Authorization: Bearer $ALICE_TOKEN" -H "Idempotency-Key: $UUID_CHN1" -d '{"amount":"123.45"}' > /dev/null
+run_curl -X POST "$API_URL/wallet/withdraw" -H "Authorization: Bearer $ALICE_TOKEN" -H "Idempotency-Key: $UUID_CHN2" -d '{"amount":"67.89"}' > /dev/null
+RESPONSE=$(run_curl -X POST "$API_URL/wallet/deposit" -H "Authorization: Bearer $ALICE_TOKEN" -H "Idempotency-Key: $UUID_CHN3" -d '{"amount":"11.11"}')
+BALANCE_END=$(echo "$RESPONSE" | jq -r '.wallet.balance_cents')
+EXPECTED=$((BALANCE_START + 12345 - 6789 + 1111))
+TESTS_TOTAL=$((TESTS_TOTAL + 1))
+if [ "$BALANCE_END" = "$EXPECTED" ]; then
+    echo "  ✓ Chain calculation correct: $BALANCE_START + 12345 - 6789 + 1111 = $BALANCE_END"
+    TESTS_PASSED=$((TESTS_PASSED + 1))
+else
+    echo "  ✗ Chain calculation mismatch: expected $EXPECTED, got $BALANCE_END"
+    TESTS_FAILED=$((TESTS_FAILED + 1))
+fi
+
 echo "\n==================================================================="
 echo ">>> FINAL STATE VALIDATION"
 echo "==================================================================="
