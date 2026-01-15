@@ -8,7 +8,6 @@ services:
                 PHP_VERSION: '8.4'
                 VARIANT: cli
         image: sail-8.4/app
-        #restart: always
         extra_hosts:
             - 'host.docker.internal:host-gateway'
         ports:
@@ -23,7 +22,6 @@ services:
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
-            WALLET_WEBHOOK_TRANSFER_URL: 'http://wirehook:9000'
         volumes:
             - '.:/var/www/html'
         networks:
@@ -43,33 +41,14 @@ services:
             - '-c'
             - |
               set -e
-              echo "Starting container setup..."
-
-              if [ ! -f ".env" ]; then
-                  echo ".env not found. Creating from .env.example..."
-                  cp .env.example .env
-              fi
-
+              [ ! -f ".env" ] && cp .env.example .env
               if [ ! -d "vendor" ]; then
-                  echo "Installing Composer dependencies..."
                   composer install --ignore-platform-reqs
-
-                  if grep -q "APP_KEY=" .env && [ -z "$(grep APP_KEY= .env | cut -d '=' -f2)" ]; then
-                       php artisan key:generate
-                  fi
+                  grep -q "APP_KEY=$" .env && php artisan key:generate
               fi
-
               composer dump-autoload
-
-              if [ ! -d "node_modules" ]; then
-                   npm install --verbose
-              fi
-
-              if [ ! -f "database/database.sqlite" ]; then
-                   echo "Creating SQLite database..."
-                   touch database/database.sqlite
-              fi
-
+              [ ! -d "node_modules" ] && npm install --verbose
+              [ ! -f "database/database.sqlite" ] && touch database/database.sqlite
               php artisan migrate --force
               php -d variables_order=EGPCS artisan octane:start --server=swoole --watch --host=0.0.0.0 --port=${APP_PORT:-80}
     laravel-worker:
@@ -84,7 +63,6 @@ services:
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
-            WALLET_WEBHOOK_TRANSFER_URL: 'http://wirehook:9000'
         volumes:
             - '.:/var/www/html'
         networks:
@@ -101,26 +79,6 @@ services:
             - artisan
             - 'queue:work'
             - '--queue=default,event-projectors,webhooks'
-    wirehook:
-        image: runabol/wirehook:latest
-        ports:
-            - '9000:9000'
-        networks:
-            - sail
-        restart: always
-        environment:
-            - WIREHOOK_PORT=9000
-    dbgate:
-        image: dbgate/dbgate:latest
-        ports:
-            - '8090:3000'
-        volumes:
-            - './database:/database'
-        networks:
-            - sail
-        restart: always
-        environment:
-            - CONNECTIONS=sqlite,redis
     mailpit:
         image: 'axllent/mailpit:latest'
         ports:
@@ -130,13 +88,10 @@ services:
             - sail
     redis:
         image: 'redis:alpine'
-        #        extra_hosts:
-        #            - 'host.docker.internal:host-gateway'
         ports:
             - '${FORWARD_REDIS_PORT:-6379}:6379'
         volumes:
             - 'sail-redis:/data'
-
         networks:
             - sail
         expose:
