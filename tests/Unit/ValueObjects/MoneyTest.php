@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Domain\Wallet\Exceptions\InvalidAmountException;
 use App\Domain\Wallet\ValueObjects\Money;
 
 test('money fromCents creates correct value', function (): void {
@@ -21,7 +22,7 @@ test('money fromDecimal creates correct value', function (): void {
 
 test('money throws on negative amount', function (): void {
     Money::fromDecimal('-10.00', 'BRL');
-})->throws(InvalidArgumentException::class, 'Amount cannot be negative');
+})->throws(InvalidAmountException::class, 'Amount cannot be negative');
 
 test('money arithmetic add works', function (): void {
     $money1 = Money::fromDecimal('100.00', 'BRL');

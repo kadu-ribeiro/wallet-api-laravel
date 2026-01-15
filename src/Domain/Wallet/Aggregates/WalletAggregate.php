@@ -201,13 +201,13 @@ final class WalletAggregate extends AggregateRoot
     protected function applyMoneyWithdrawn(MoneyWithdrawn $event): void
     {
         $this->balanceCents = $event->balanceAfterCents;
-        $this->updateDailyWithdrawalAmount($event->amountCents);
+        $this->updateDailyWithdrawalAmount($event->amountCents, Carbon::make($event->createdAt()));
     }
 
     protected function applyMoneyTransferredOut(MoneyTransferredOut $event): void
     {
         $this->balanceCents = $event->balanceAfterCents;
-        $this->updateDailyTransferOutAmount($event->amountCents);
+        $this->updateDailyTransferOutAmount($event->amountCents, Carbon::make($event->createdAt()));
     }
 
     protected function applyMoneyTransferredIn(MoneyTransferredIn $event): void
@@ -269,7 +269,7 @@ final class WalletAggregate extends AggregateRoot
     private function ensureDailyWithdrawalLimitNotExceeded(int $amountCents): void
     {
         $todayUTC = Carbon::now('UTC')->startOfDay();
-        $currentUsage = $this->isTransactionToday($todayUTC) ? $this->dailyWithdrawalAmount : 0;
+        $currentUsage = $this->isTransactionSameDay($todayUTC) ? $this->dailyWithdrawalAmount : 0;
         $limit = config('wallet.daily_limits.withdrawal');
 
         if (($currentUsage + $amountCents) > $limit) {
@@ -280,7 +280,7 @@ final class WalletAggregate extends AggregateRoot
     private function ensureDailyTransferLimitNotExceeded(int $amountCents): void
     {
         $todayUTC = Carbon::now('UTC')->startOfDay();
-        $currentUsage = $this->isTransactionToday($todayUTC) ? $this->dailyTransferOutAmount : 0;
+        $currentUsage = $this->isTransactionSameDay($todayUTC) ? $this->dailyTransferOutAmount : 0;
         $limit = config('wallet.daily_limits.transfer');
 
         if (($currentUsage + $amountCents) > $limit) {
@@ -288,35 +288,35 @@ final class WalletAggregate extends AggregateRoot
         }
     }
 
-    private function isTransactionToday(Carbon $todayUTC): bool
+    private function isTransactionSameDay(Carbon $dateUTC): bool
     {
         if ($this->lastTransactionDate === null) {
             return false;
         }
 
-        return $this->lastTransactionDate->isSameDay($todayUTC);
+        return $this->lastTransactionDate->isSameDay($dateUTC);
     }
 
-    private function updateDailyUsage(string $propertyName, int $amountCents): void
+    private function updateDailyUsage(string $propertyName, int $amountCents, Carbon $eventDate): void
     {
-        $todayUTC = Carbon::now('UTC')->startOfDay();
+        $eventDateUTC = $eventDate->copy()->setTimezone('UTC')->startOfDay();
 
-        if (! $this->isTransactionToday($todayUTC)) {
+        if (! $this->isTransactionSameDay($eventDateUTC)) {
             $this->{$propertyName} = $amountCents;
         } else {
             $this->{$propertyName} += $amountCents;
         }
 
-        $this->lastTransactionDate = $todayUTC;
+        $this->lastTransactionDate = $eventDateUTC;
     }
 
-    private function updateDailyWithdrawalAmount(int $amountCents): void
+    private function updateDailyWithdrawalAmount(int $amountCents, Carbon $eventDate): void
     {
-        $this->updateDailyUsage('dailyWithdrawalAmount', $amountCents);
+        $this->updateDailyUsage('dailyWithdrawalAmount', $amountCents, $eventDate);
     }
 
-    private function updateDailyTransferOutAmount(int $amountCents): void
+    private function updateDailyTransferOutAmount(int $amountCents, Carbon $eventDate): void
     {
-        $this->updateDailyUsage('dailyTransferOutAmount', $amountCents);
+        $this->updateDailyUsage('dailyTransferOutAmount', $amountCents, $eventDate);
     }
 }

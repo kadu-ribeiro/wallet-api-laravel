@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Shared\ValueObjects;
 
-use InvalidArgumentException;
+use App\Domain\Shared\Exceptions\InvalidIdentifierException;
 
 abstract readonly class UuidIdentifier
 {
@@ -12,9 +12,7 @@ abstract readonly class UuidIdentifier
         public string $value
     ) {
         if (! self::isValid($value)) {
-            throw new InvalidArgumentException(
-                sprintf('"%s" is not a valid UUID for %s', $value, static::class)
-            );
+            throw InvalidIdentifierException::invalidUuid($value, static::class);
         }
     }
 

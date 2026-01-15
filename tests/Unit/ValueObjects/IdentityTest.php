@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Domain\Shared\Exceptions\InvalidIdentifierException;
 use App\Domain\User\ValueObjects\UserId;
 use App\Domain\Wallet\ValueObjects\WalletId;
 use Illuminate\Support\Str;
@@ -15,7 +16,7 @@ test('userId VO accepts valid UUID', function (): void {
 
 test('userId VO throws on invalid UUID', function (): void {
     new UserId('not-a-uuid');
-})->throws(InvalidArgumentException::class);
+})->throws(InvalidIdentifierException::class);
 
 test('walletId VO accepts valid UUID', function (): void {
     $uuid = Str::uuid()->toString();

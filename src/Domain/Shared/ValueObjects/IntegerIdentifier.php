@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domain\Shared\ValueObjects;
 
-use InvalidArgumentException;
+use App\Domain\Shared\Exceptions\InvalidIdentifierException;
 
 abstract readonly class IntegerIdentifier
 {
@@ -12,9 +12,7 @@ abstract readonly class IntegerIdentifier
         public int $value
     ) {
         if ($value <= 0) {
-            throw new InvalidArgumentException(
-                sprintf('ID must be positive integer, got %d for %s', $value, static::class)
-            );
+            throw InvalidIdentifierException::mustBePositive($value, static::class);
         }
     }
 
