@@ -106,6 +106,7 @@ docker-compose up -d
 
 # API: http://localhost:8080
 # Email viewer (Mailpit): http://localhost:8025
+# Webhook viewer https://app.h00k.dev/b/359c32ea-80f3-4784-aaba-8e0e3152053b
 ```
 
 The container automatically handles:
@@ -460,7 +461,7 @@ Webhook notifications are sent when transfers are received:
 
 **Configuration (.env):**
 ```env
-WALLET_WEBHOOK_TRANSFER_URL=https://webhook.site/your-unique-id
+WALLET_WEBHOOK_TRANSFER_URL=https://bin.h00k.dev/359c32ea-80f3-4784-aaba-8e0e3152053b
 ```
 
 **Implementation:**
