@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Domain\Wallet\Aggregates\WalletAggregate;
+use App\Domain\Wallet\Exceptions\DailyLimitExceededException;
 use App\Domain\Wallet\Exceptions\InsufficientBalanceException;
 use App\Infrastructure\Persistence\Eloquent\User;
 use Illuminate\Support\Str;
@@ -120,4 +121,58 @@ test('wallet projector updates balance after deposit', function (): void {
         'id' => $walletId,
         'balance_cents' => 15000,
     ]);
+});
+
+test('wallet aggregate throws on daily withdrawal limit exceeded', function (): void {
+    config(['wallet.daily_limits.withdrawal' => 100000]);
+
+    $walletId = Str::uuid()->toString();
+
+    $aggregate = WalletAggregate::retrieve($walletId);
+    $aggregate->createWallet($this->user->id, 'BRL');
+    $aggregate->deposit(500000, ['idempotency_key' => Str::uuid()->toString()]);
+    $aggregate->withdraw(60000, ['idempotency_key' => Str::uuid()->toString()]);
+    $aggregate->withdraw(50000, ['idempotency_key' => Str::uuid()->toString()]);
+})->throws(DailyLimitExceededException::class);
+
+test('wallet aggregate throws on daily transfer limit exceeded', function (): void {
+    config(['wallet.daily_limits.transfer' => 100000]);
+
+    $walletId = Str::uuid()->toString();
+
+    $aggregate = WalletAggregate::retrieve($walletId);
+    $aggregate->createWallet($this->user->id, 'BRL');
+    $aggregate->deposit(500000, ['idempotency_key' => Str::uuid()->toString()]);
+    $aggregate->transferOut(60000, 'recipient@example.com', Str::uuid()->toString());
+    $aggregate->transferOut(50000, 'recipient@example.com', Str::uuid()->toString());
+})->throws(DailyLimitExceededException::class);
+
+test('wallet aggregate allows withdrawal within daily limit', function (): void {
+    config(['wallet.daily_limits.withdrawal' => 100000]);
+
+    $walletId = Str::uuid()->toString();
+
+    $aggregate = WalletAggregate::retrieve($walletId);
+    $aggregate->createWallet($this->user->id, 'BRL');
+    $aggregate->deposit(500000, ['idempotency_key' => Str::uuid()->toString()]);
+    $aggregate->withdraw(50000, ['idempotency_key' => Str::uuid()->toString()]);
+    $aggregate->withdraw(50000, ['idempotency_key' => Str::uuid()->toString()]);
+    $aggregate->persist();
+
+    expect($aggregate->getBalance())->toBe(400000);
+});
+
+test('wallet aggregate allows transfer within daily limit', function (): void {
+    config(['wallet.daily_limits.transfer' => 100000]);
+
+    $walletId = Str::uuid()->toString();
+
+    $aggregate = WalletAggregate::retrieve($walletId);
+    $aggregate->createWallet($this->user->id, 'BRL');
+    $aggregate->deposit(500000, ['idempotency_key' => Str::uuid()->toString()]);
+    $aggregate->transferOut(50000, 'recipient@example.com', Str::uuid()->toString());
+    $aggregate->transferOut(50000, 'recipient@example.com', Str::uuid()->toString());
+    $aggregate->persist();
+
+    expect($aggregate->getBalance())->toBe(400000);
 });
