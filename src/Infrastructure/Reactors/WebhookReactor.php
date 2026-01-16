@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Infrastructure\Projectors;
+namespace App\Infrastructure\Reactors;
 
 use App\Domain\Wallet\Events\MoneyTransferredIn;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Spatie\EventSourcing\EventHandlers\Projectors\Projector;
+use Spatie\EventSourcing\EventHandlers\Reactors\Reactor;
 use Throwable;
 
-final class WebhookProjector extends Projector
+final class WebhookReactor extends Reactor implements ShouldQueue
 {
     public function onMoneyTransferredIn(MoneyTransferredIn $event): void
     {
