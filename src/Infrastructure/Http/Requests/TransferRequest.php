@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Http\Requests;
 
+use App\Domain\User\Exceptions\UserHasNoWalletException;
 use App\Domain\User\Services\AuthContextInterface;
+use App\Domain\Wallet\Repositories\WalletRepositoryInterface;
 use Illuminate\Foundation\Http\FormRequest;
 
 final class TransferRequest extends FormRequest
 {
     public function __construct(
-        private readonly AuthContextInterface $authProvider
+        private readonly AuthContextInterface $authProvider,
+        private readonly WalletRepositoryInterface $walletRepository
     ) {
         parent::__construct();
     }
@@ -67,6 +70,13 @@ final class TransferRequest extends FormRequest
 
     public function senderWalletId(): string
     {
-        return $this->authProvider->getWalletId()->value;
+        $userId = $this->authProvider->getUserId();
+        $wallet = $this->walletRepository->findByUserId($userId);
+
+        if (! $wallet) {
+            throw UserHasNoWalletException::create();
+        }
+
+        return $wallet->id->value;
     }
 }

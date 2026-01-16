@@ -10,7 +10,9 @@ use App\Application\UseCases\Wallet\DepositMoneyUseCase;
 use App\Application\UseCases\Wallet\GetTransactionHistoryUseCase;
 use App\Application\UseCases\Wallet\GetWalletBalanceUseCase;
 use App\Application\UseCases\Wallet\WithdrawMoneyUseCase;
+use App\Domain\User\Exceptions\UserHasNoWalletException;
 use App\Domain\User\Services\AuthContextInterface;
+use App\Domain\Wallet\Repositories\WalletRepositoryInterface;
 use App\Infrastructure\Http\Requests\DepositRequest;
 use App\Infrastructure\Http\Requests\WithdrawRequest;
 use App\Infrastructure\Persistence\Eloquent\Wallet;
@@ -24,12 +26,25 @@ class WalletController extends Controller
         private readonly GetTransactionHistoryUseCase $getTransactionHistoryUseCase,
         private readonly DepositMoneyUseCase $depositMoneyUseCase,
         private readonly WithdrawMoneyUseCase $withdrawMoneyUseCase,
-        private readonly AuthContextInterface $authContext
+        private readonly AuthContextInterface $authContext,
+        private readonly WalletRepositoryInterface $walletRepository
     ) {}
+
+    private function getAuthenticatedWalletId(): string
+    {
+        $userId = $this->authContext->getUserId();
+        $wallet = $this->walletRepository->findByUserId($userId);
+
+        if (! $wallet) {
+            throw UserHasNoWalletException::create();
+        }
+
+        return $wallet->id->value;
+    }
 
     public function show(): JsonResponse
     {
-        $walletId = $this->authContext->getWalletId()->value;
+        $walletId = $this->getAuthenticatedWalletId();
         $wallet = $this->getWalletBalanceUseCase->execute($walletId);
 
         return response()->json(['data' => $wallet->toArray()]);
@@ -37,7 +52,7 @@ class WalletController extends Controller
 
     public function transactions(Request $request): JsonResponse
     {
-        $walletId = $this->authContext->getWalletId()->value;
+        $walletId = $this->getAuthenticatedWalletId();
         $perPage = (int) $request->query('per_page', 50);
         $transactions = $this->getTransactionHistoryUseCase->execute($walletId, $perPage);
 
@@ -48,7 +63,7 @@ class WalletController extends Controller
 
     public function deposit(DepositRequest $request): JsonResponse
     {
-        $walletId = $this->authContext->getWalletId()->value;
+        $walletId = $this->getAuthenticatedWalletId();
         $result = $this->depositMoneyUseCase->execute(
             DepositMoneyDTO::fromPrimitives(
                 walletId: $walletId,
@@ -63,7 +78,7 @@ class WalletController extends Controller
 
     public function withdraw(WithdrawRequest $request): JsonResponse
     {
-        $walletId = $this->authContext->getWalletId()->value;
+        $walletId = $this->getAuthenticatedWalletId();
         $result = $this->withdrawMoneyUseCase->execute(
             WithdrawMoneyDTO::fromPrimitives(
                 walletId: $walletId,
