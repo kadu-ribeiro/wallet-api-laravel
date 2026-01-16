@@ -26,8 +26,8 @@ use App\Infrastructure\Persistence\Repositories\WalletRepository;
 use App\Infrastructure\Projectors\TransactionProjector;
 use App\Infrastructure\Projectors\UserProjector;
 use App\Infrastructure\Projectors\WalletProjector;
-use App\Infrastructure\Projectors\WebhookProjector;
 use App\Infrastructure\Reactors\TransferNotificationReactor;
+use App\Infrastructure\Reactors\WebhookReactor;
 use App\Infrastructure\Reactors\WelcomeEmailReactor;
 use Illuminate\Contracts\Debug\ExceptionHandler as LaravelExceptionHandler;
 use Illuminate\Support\Facades\Route;
@@ -104,11 +104,11 @@ class Application extends ServiceProvider
                 UserProjector::class,
                 WalletProjector::class,
                 TransactionProjector::class,
-                WebhookProjector::class,
             ])
             ->addReactors([
                 WelcomeEmailReactor::class,
                 TransferNotificationReactor::class,
+                WebhookReactor::class,
             ]);
     }
 

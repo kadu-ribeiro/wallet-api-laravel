@@ -13,6 +13,8 @@ use App\Domain\Wallet\Exceptions\InvalidAmountException;
 use App\Domain\Wallet\Exceptions\TransferAlreadyProcessedException;
 use App\Domain\Wallet\Repositories\TransactionRepositoryInterface;
 use App\Domain\Wallet\ValueObjects\Money;
+use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
 
 final readonly class WithdrawMoneyUseCase implements WithdrawMoneyUseCaseInterface
 {
@@ -34,9 +36,18 @@ final readonly class WithdrawMoneyUseCase implements WithdrawMoneyUseCaseInterfa
         $amount = Money::fromDecimal($dto->amount);
         $metadata = array_merge($dto->metadata, ['idempotency_key' => $dto->idempotencyKey]);
 
-        $aggregate = WalletAggregate::retrieve($dto->walletId)
-            ->withdraw($amount->toCents(), $metadata)
-            ->persist();
+        try {
+            $aggregate = WalletAggregate::retrieve($dto->walletId)
+                ->withdraw($amount->toCents(), $metadata)
+                ->persist();
+        } catch (UniqueConstraintViolationException) {
+            throw TransferAlreadyProcessedException::withIdempotencyKey($dto->idempotencyKey);
+        } catch (QueryException $e) {
+            if ((int) $e->getCode() === 23000) {
+                throw TransferAlreadyProcessedException::withIdempotencyKey($dto->idempotencyKey);
+            }
+            throw $e;
+        }
 
         $balance = Money::fromCents($aggregate->getBalance(), $aggregate->getCurrency());
 

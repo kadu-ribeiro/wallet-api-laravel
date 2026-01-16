@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Domain\Wallet\Aggregates\WalletAggregate;
+use App\Domain\Wallet\Exceptions\InsufficientBalanceException;
 use App\Infrastructure\Persistence\Eloquent\User;
 use App\Infrastructure\Persistence\Eloquent\Wallet;
 use Illuminate\Support\Str;
@@ -53,14 +55,17 @@ test('can withdraw money if sufficient balance', function (): void {
 
 test('cannot have negative balance', function (): void {
     $user = User::factory()->create();
-    $wallet = Wallet::create([
-        'id' => Str::uuid()->toString(),
-        'user_id' => $user->id,
-        'balance_cents' => 5000,
-        'currency' => 'BRL',
-    ]);
+    $walletId = Str::uuid()->toString();
 
-    expect($wallet->balance_cents)->toBeLessThan(10000);
+    WalletAggregate::retrieve($walletId)
+        ->createWallet($user->id)
+        ->deposit(5000, ['idempotency_key' => Str::uuid()->toString()])
+        ->persist();
+
+    expect(fn () => WalletAggregate::retrieve($walletId)
+        ->withdraw(6000, ['idempotency_key' => Str::uuid()->toString()])
+        ->persist()
+    )->toThrow(InsufficientBalanceException::class);
 });
 
 test('wallet user relationship works', function (): void {

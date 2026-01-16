@@ -5,8 +5,8 @@ declare(strict_types=1);
 use App\Infrastructure\Projectors\TransactionProjector;
 use App\Infrastructure\Projectors\UserProjector;
 use App\Infrastructure\Projectors\WalletProjector;
-use App\Infrastructure\Projectors\WebhookProjector;
 use App\Infrastructure\Reactors\TransferNotificationReactor;
+use App\Infrastructure\Reactors\WebhookReactor;
 use App\Infrastructure\Reactors\WelcomeEmailReactor;
 use Spatie\EventSourcing\EventSerializers\JsonEventSerializer;
 use Spatie\EventSourcing\Snapshots\EloquentSnapshot;
@@ -46,7 +46,6 @@ return [
         UserProjector::class,
         WalletProjector::class,
         TransactionProjector::class,
-        WebhookProjector::class,
     ],
 
     /*
@@ -57,6 +56,7 @@ return [
     'reactors' => [
         WelcomeEmailReactor::class,
         TransferNotificationReactor::class,
+        WebhookReactor::class,
     ],
 
     /*
